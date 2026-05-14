@@ -9,8 +9,8 @@ import ProductControls from "./ProductControls";
 import useProduct from "@/components/Products/Hooks/useProduct";
 import PurchaseProcess from "./PurchaseProcess";
 import useProductPagentaion from "./Hooks/useProductsPagentation";
-import useProductStore from "./ProductStore";
 import MainDialog from "@/Admin/components/MainDialog";
+import { keyframes } from "@emotion/react";
 interface Props {
   homePage: boolean;
   edit_delete:boolean;
@@ -32,11 +32,16 @@ const Products = ({ homePage,edit_delete }: Props) => {
     deleteProductFromFav,
     favItems,
     setFavItems,
+    archiveProduct
   } = useProduct(false);
 
-  const {archiveProduct} = useProductStore()
-
-
+const soldAnimation = keyframes`
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(45deg) scale(1.1); }
+  50% { transform: rotate(0deg) scale(1); }
+  75% { transform: rotate(-45deg) scale(1.1); }
+  100% { transform: rotate(0deg) scale(1); }
+`;
 
 
 
@@ -134,7 +139,7 @@ const Products = ({ homePage,edit_delete }: Props) => {
                     favItems.includes(item.id) ? "pink" : "#f6f6f6"
                   }`}
                   className="shadow-xl shadow-blue-500/50"
-                  _hover={{ margin: "-0.5npx 0 0 -0.5px" }}
+                  _hover={{ margin: "-0.5px 0 0 -2px" }}
                   transition="0.3s"
                 >
                   <Link to={`/${item.href}${item.id}/${item.category}`}>
@@ -149,8 +154,25 @@ const Products = ({ homePage,edit_delete }: Props) => {
                   </Link>
                   <Card.Body gap={{ base: 0, sm: 1 }} marginY={-4}>
                     <Card.Title fontSize={{ base: 17, sm: 18, lg: 20, xl: 20 }}>
-                      {item.productName}
+                      <HStack>
+                                            {item.productName}
+                                            <Box
+                        display={item.isDiscounted ? "block" : "none"}
+                        bg="red.500"
+                        color="white"
+                        px="4"
+                        py="1"
+                        rounded="md"
+                        fontWeight="bold"
+                        w="fit-content"
+                        boxShadow="lg"
+                        animation={`${soldAnimation} 3s ease-in-out infinite`}
+                      >
+                        SOLD
+                      </Box>
+                      </HStack>
                     </Card.Title>
+                    
                     <Card.Description
                       fontSize={{ base: 14, sm: 15, lg: 15, xl: 16 }}
                     >
@@ -169,7 +191,7 @@ const Products = ({ homePage,edit_delete }: Props) => {
                           textStyle="2xl"
                           fontWeight="medium"
                           letterSpacing="tight"
-                          mt={{ base: 1, sm: 4 }}
+                          mt={{ base: 0, sm: 0 }}
                         >
                           {item.oldProductPrice}
                         </Text>
@@ -184,6 +206,7 @@ const Products = ({ homePage,edit_delete }: Props) => {
                       >
                         {item.productPrice}
                       </Text>
+
                     </HStack>
                   </Card.Body>
                   <Card.Footer gap="0">

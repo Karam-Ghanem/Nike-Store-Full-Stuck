@@ -10,6 +10,8 @@ const useProduct = (homePage:boolean)=>{
 
     const { addProductToFavList, favoritesItems, deleteProductFromFav } =useFavoriteStore();
 
+    const {archiveProduct} = useProductStore();
+
     const [favItems, setFavItems] = useState(favoritesItems.map((item) => item.id));
 
 
@@ -22,6 +24,7 @@ const useProduct = (homePage:boolean)=>{
     favItems,
     setFavItems,
     homePage,
+    archiveProduct
   }
 
 
