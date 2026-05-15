@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, HStack, IconButton, Spinner, Text } from "@chakra-ui/react";
+import { Box, Container, Flex, HStack, IconButton, Spinner, Text } from "@chakra-ui/react";
 import MainHead from "../PublicCompontents/MainHead";
 import { SimpleGrid } from "@chakra-ui/react";
 import { Card, Image } from "@chakra-ui/react";
@@ -9,8 +9,10 @@ import ProductControls from "./ProductControls";
 import useProduct from "@/components/Products/Hooks/useProduct";
 import PurchaseProcess from "./PurchaseProcess";
 import useProductPagentaion from "./Hooks/useProductsPagentation";
-import MainDialog from "@/Admin/components/MainDialog";
-import { keyframes } from "@emotion/react";
+import EditAndArchiveAdmin from "./EditAndArchiveAdmin";
+import ShowAllProductsButton from "./ShowAllProductsButton";
+import PagenantionButtons from "./PagenantionButtons";
+import SoldDesign from "./SoldDesign";
 interface Props {
   homePage: boolean;
   edit_delete:boolean;
@@ -32,16 +34,9 @@ const Products = ({ homePage,edit_delete }: Props) => {
     deleteProductFromFav,
     favItems,
     setFavItems,
-    archiveProduct
   } = useProduct(false);
 
-const soldAnimation = keyframes`
-  0% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(45deg) scale(1.1); }
-  50% { transform: rotate(0deg) scale(1); }
-  75% { transform: rotate(-45deg) scale(1.1); }
-  100% { transform: rotate(0deg) scale(1); }
-`;
+
 
 
 
@@ -62,60 +57,13 @@ const soldAnimation = keyframes`
           </Flex>
         ) : (
           <Box>
-            <Box
-              marginBottom="50px"
-              textAlign={{ base: "center", md: "start" }}
-            >
               {homePage && (
-                <Link to={"/products"}>
-                  <Text
-                    cursor="pointer"
-                    display={{ base: "inline-block", md: "inline" }}
-                    color="white"
-                    backgroundColor="#6c14d0"
-                    padding={{ base: "10px", sm: "10px 20px", lg: "15px 30px" }}
-                    className="shadow-xl shadow-blue-500/50"
-                    _hover={{ color: "black", backgroundColor: "#a800b7" }}
-                    transition="0.5s"
-                    fontSize={{
-                      base: "13px",
-                      sm: "18px",
-                      md: "19px",
-                      lg: "18px",
-                      xl: "18px",
-                    }}
-                  >
-                    Show All Products
-                  </Text>
-                </Link>
+                <ShowAllProductsButton/>
               )}
-            </Box>
 
             {actualProductList.length >= 1 && !homePage && (
-              <Flex justifyContent={"center"}>
-                <Button
-                  bg={"#7008e7"}
-                  disabled={currentPage == 1}
-                  _disabled={{ cursor: "menuitem" }}
-                  onClick={() => {
-                    setCurrentPage(currentPage - 1);
-                  }}
-                >
-                  Prev
-                </Button>
 
-                <Box margin={"10px 20px"}></Box>
-                <Button
-                  bg={"#7008e7"}
-                  disabled={currentPage == needed}
-                  _disabled={{ cursor: "menuitem" }}
-                  onClick={() => {
-                    setCurrentPage(currentPage + 1);
-                  }}
-                >
-                  Next
-                </Button>
-              </Flex>
+              <PagenantionButtons needed={needed} currentPage={currentPage} setCurrentPage={(cp)=>setCurrentPage(cp)}/>
             )}
 
             <SimpleGrid
@@ -125,7 +73,6 @@ const soldAnimation = keyframes`
               {actualProductList.map((item) => (
                 <Card.Root
                   display={item.isArchived ? "none" : "block"}
-                  // height={edit_delete ? 500 : ""}
                   marginTop={4}
                   cursor="pointer"
                   maxW="2xl"
@@ -155,31 +102,15 @@ const soldAnimation = keyframes`
                   <Card.Body gap={{ base: 0, sm: 1 }} marginY={-4}>
                     <Card.Title fontSize={{ base: 17, sm: 18, lg: 20, xl: 20 }}>
                       <HStack>
-                                            {item.productName}
-                                            <Box
-                        display={item.isDiscounted ? "block" : "none"}
-                        bg="red.500"
-                        color="white"
-                        px="4"
-                        py="1"
-                        rounded="md"
-                        fontWeight="bold"
-                        w="fit-content"
-                        boxShadow="lg"
-                        animation={`${soldAnimation} 3s ease-in-out infinite`}
-                      >
-                        SOLD
-                      </Box>
+                        {item.productName}
+                        <SoldDesign item={item}/>
+
                       </HStack>
                     </Card.Title>
                     
                     <Card.Description
                       fontSize={{ base: 14, sm: 15, lg: 15, xl: 16 }}
                     >
-                      {/* <Text fontSize={10}>
-                        {item.category}
-                        {item.gender}
-                      </Text> */}
                       {item.productDescription}
                     </Card.Description>
 
@@ -247,47 +178,10 @@ const soldAnimation = keyframes`
                       </IconButton>
                     </Box>
                   </Card.Footer>
-                  {edit_delete && (
-                    <HStack
-                      justifyContent={"space-between"}
-                      width={"100%"}
-                      padding={{ base: 2, sm: 2 }}
-                      borderTop={"1px solid #6c14d0"}
-                    >
-                      <Button
-                        bg={"blue"}
-                        fontSize={{ base: 6, sm: 10, md: 12, lg: 15 }}
-                        width={{
-                          base: "20px",
-                          sm: "60px",
-                          md: "80px",
-                          lg: "100px",
-                        }}
-                      >
-                        <Link to={`/admin/editproduct/${item.id}`}>Edit</Link>
-                      </Button>
-
-                      <MainDialog
-                        id={item.id}
-                        parameter={item}
-                        completeTheProcess={(item) => archiveProduct(item)}
-                        theProces="Archive"
-                      >
-                        <Button
-                          fontSize={{ base: 6, sm: 10, md: 12, lg: 15 }}
-                          width={{
-                            base: "20px",
-                            sm: "60px",
-                            md: "80px",
-                            lg: "100px",
-                          }}
-                          bg={"red"}
-                        >
-                          Archive
-                        </Button>
-                      </MainDialog>
-                    </HStack>
-                  )}
+                  
+                  {edit_delete && 
+                    <EditAndArchiveAdmin item={item}/>
+                  }
                 </Card.Root>
               ))}
             </SimpleGrid>
