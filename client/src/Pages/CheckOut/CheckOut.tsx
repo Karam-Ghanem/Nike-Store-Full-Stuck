@@ -1,9 +1,10 @@
 import MainHead from "@/components/PublicCompontents/MainHead";
-import { Box, Button, SimpleGrid } from "@chakra-ui/react";
+import { Box, SimpleGrid } from "@chakra-ui/react";
 import CheckOutForm from "./CheckOutForm";
 import MyMap from "./MyMap";
 import CheckOutTable from "./CheckOutTable";
 import useCheckOut from "./Hooks/useCheckOut";
+import CheckOutSubmitButton from "./CheckOutSubmitButton";
 
 
 export interface AdressForm {
@@ -26,7 +27,7 @@ export interface AdressForm{
 const CheckOut = () => {
 
 
-const {addressForm,navigate,setAdressForm,setCheckOutForm,setSite,site} = useCheckOut()
+const {setAdressForm,setSite} = useCheckOut()
 
 
   return (
@@ -40,22 +41,7 @@ const {addressForm,navigate,setAdressForm,setCheckOutForm,setSite,site} = useChe
         <Box>
           <CheckOutTable />
         </Box>
-        <Box marginTop={10}>
-          <Button
-            fontSize={{ base: "15px", sm: "22px", md: "25px", lg: "25px" }}
-            bg={"#7008e7"}
-            onClick={() => {
-              setCheckOutForm({
-                addressForm: addressForm,
-                address: site,
-              });
-
-              navigate("pay");
-            }}
-          >
-            Submit
-          </Button>
-        </Box>
+          <CheckOutSubmitButton/>
       </SimpleGrid>
     </>
   );

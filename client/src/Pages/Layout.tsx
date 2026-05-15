@@ -11,7 +11,8 @@ const Layout = () => {
   const location = useLocation();
   return (
     <>
-      <Flex justifyContent={'space-between'} flexDir={'column'} minHeight={'100%'}>
+    <Container>
+        <Flex justifyContent={'space-between'} flexDir={'column'} minHeight={'100%'}>
         <Header />
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
@@ -22,6 +23,7 @@ const Layout = () => {
         </AnimatePresence>
         <Footer />
       </Flex>
+    </Container>
     </>
   );
 };

@@ -35,7 +35,6 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
             <form action="">
               <Stack gap="4" align="flex-start" maxW="xl">
                 <Field.Root>
-                  {/* <Field.Label fontSize={"20px"}> Name</Field.Label> */}
                   <Input
                     value={adressValue.name}
                     onChange={(e) => {
@@ -49,7 +48,6 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
                 </Field.Root>
 
                 <Field.Root>
-                  {/* <Field.Label fontSize={"20px"}>Email</Field.Label> */}
                   <Input
                     type="email"
                     value={adressValue.email}
@@ -64,7 +62,6 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
                 </Field.Root>
 
                 <Field.Root>
-                  {/* <Field.Label fontSize={"20px"}>Phone</Field.Label> */}
                   <Input
                     value={adressValue.phone}
                     onChange={(e) => {
@@ -78,8 +75,6 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
                 </Field.Root>
 
                 <Field.Root>
-                  {/* <Field.Label fontSize={"20px"}>Password</Field.Label> */}
-                  {/* <Input border={"1px solid #a800b7"} /> */}
                   <Textarea
                     placeholder="Say Something"
                     outline="1px solid #a800b7"
