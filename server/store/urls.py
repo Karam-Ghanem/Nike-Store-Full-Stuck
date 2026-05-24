@@ -12,6 +12,7 @@ from .views import (
     CustomObtainAuthToken,
     CouponViewSet,
     LogoutView,
+    AdminDashboardView,
 )
 
 router = DefaultRouter()
@@ -25,6 +26,7 @@ router.register(r'coupons', CouponViewSet, basename='coupon')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('admin/dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/login/', CustomObtainAuthToken.as_view(), name='login'),
     path('auth/user/', CurrentUserView.as_view(), name='current_user'),

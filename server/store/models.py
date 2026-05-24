@@ -14,13 +14,26 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    GENDER_MALE = 'male'
+    GENDER_FEMALE = 'female'
+    GENDER_UNISEX = 'unisex'
+    GENDER_CHOICES = [
+        (GENDER_MALE, 'Male'),
+        (GENDER_FEMALE, 'Female'),
+        (GENDER_UNISEX, 'Unisex'),
+    ]
+
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    old_product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    is_discounted = models.BooleanField(default=False)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default=GENDER_UNISEX)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

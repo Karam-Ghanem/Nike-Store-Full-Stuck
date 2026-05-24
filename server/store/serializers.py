@@ -31,10 +31,18 @@ class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
         source='category', queryset=Category.objects.all(), write_only=True
     )
+    isDiscounted = serializers.BooleanField(source='is_discounted')
+    oldProductPrice = serializers.DecimalField(
+        source='old_product_price', max_digits=10, decimal_places=2, allow_null=True, required=False
+    )
+    isArchived = serializers.BooleanField(source='is_archived')
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug', 'description', 'price', 'image', 'is_active', 'category', 'category_id', 'sizes']
+        fields = [
+            'id', 'name', 'slug', 'description', 'price', 'oldProductPrice', 'isDiscounted',
+            'gender', 'image', 'is_active', 'isArchived', 'category', 'category_id', 'sizes'
+        ]
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -138,7 +146,8 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             except Exception:
                 coupon = None
 
-        order = Order.objects.create(**validated_data, user=self.context['request'].user, coupon=coupon)
+        user = validated_data.pop('user', self.context['request'].user)
+        order = Order.objects.create(**validated_data, user=user, coupon=coupon)
         for item_data in items_data:
             product = item_data['product']
             product_size = item_data['product_size']

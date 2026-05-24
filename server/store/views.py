@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
+from django.db.models import F, Sum
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from .models import Category, Product, Favorite, CartItem, Order, Review, Coupon
+from .models import Category, Product, Favorite, CartItem, Order, OrderItem, Review, Coupon
 from .serializers import (
     CategorySerializer,
     ProductSerializer,
@@ -48,12 +49,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.filter(is_active=True)
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True)
+        if self.request.user.is_staff:
+            queryset = Product.objects.all()
+        else:
+            queryset = Product.objects.filter(is_active=True, is_archived=False)
         category_id = self.request.query_params.get('category')
         search = self.request.query_params.get('search')
         if category_id:
@@ -61,6 +65,39 @@ class ProductViewSet(viewsets.ModelViewSet):
         if search:
             queryset = queryset.filter(name__icontains=search)
         return queryset
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def archive(self, request, pk=None):
+        product = self.get_object()
+        product.is_archived = True
+        product.save(update_fields=['is_archived'])
+        return Response({'status': 'archived', 'id': product.id})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def unarchive(self, request, pk=None):
+        product = self.get_object()
+        product.is_archived = False
+        product.save(update_fields=['is_archived'])
+        return Response({'status': 'unarchived', 'id': product.id})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def set_discount(self, request, pk=None):
+        product = self.get_object()
+        is_discounted = request.data.get('isDiscounted')
+        old_price = request.data.get('oldProductPrice')
+        if is_discounted is not None:
+            if isinstance(is_discounted, str):
+                is_discounted = is_discounted.lower() in ['true', '1', 'yes']
+            else:
+                is_discounted = bool(is_discounted)
+            product.is_discounted = is_discounted
+        if old_price is not None:
+            try:
+                product.old_product_price = old_price
+            except Exception:
+                return Response({'detail': 'Invalid oldProductPrice value.'}, status=status.HTTP_400_BAD_REQUEST)
+        product.save(update_fields=['is_discounted', 'old_product_price'])
+        return Response({'status': 'discount_updated', 'id': product.id})
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
@@ -166,3 +203,28 @@ class CustomObtainAuthToken(ObtainAuthToken):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
         return Response({'token': token.key, 'user_id': token.user_id, 'username': token.user.username})
+
+
+class AdminDashboardView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        total_orders = Order.objects.count()
+        completed_orders = Order.objects.filter(status='completed').count()
+        pending_orders = Order.objects.filter(status='pending').count()
+        total_sales = OrderItem.objects.filter(order__status='completed').aggregate(
+            total=Sum(F('price') * F('quantity'))
+        )['total'] or 0
+        active_products = Product.objects.filter(is_active=True, is_archived=False).count()
+        archived_products = Product.objects.filter(is_archived=True).count()
+        total_reviews = Review.objects.count()
+
+        return Response({
+            'total_orders': total_orders,
+            'completed_orders': completed_orders,
+            'pending_orders': pending_orders,
+            'total_sales': float(total_sales),
+            'active_products': active_products,
+            'archived_products': archived_products,
+            'total_reviews': total_reviews,
+        })
