@@ -10,7 +10,6 @@ from .views import (
     RegisterView,
     CurrentUserView,
     CustomObtainAuthToken,
-    CouponViewSet,
     LogoutView,
     AdminDashboardView,
 )
@@ -22,7 +21,6 @@ router.register(r'favorites', FavoriteViewSet, basename='favorite')
 router.register(r'cart', CartItemViewSet, basename='cartitem')
 router.register(r'orders', OrderViewSet, basename='order')
 router.register(r'reviews', ReviewViewSet, basename='review')
-router.register(r'coupons', CouponViewSet, basename='coupon')
 
 urlpatterns = [
     path('', include(router.urls)),
