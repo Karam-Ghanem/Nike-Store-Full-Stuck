@@ -1,4 +1,6 @@
 from datetime import timedelta
+from decimal import Decimal
+from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
@@ -40,41 +42,7 @@ class ProductSize(models.Model):
         return f'{self.product.name} - {self.size}'
 
 
-class Coupon(models.Model):
-    DISCOUNT_TYPE_PERCENT = 'percent'
-    DISCOUNT_TYPE_FIXED = 'fixed'
-    DISCOUNT_TYPE_CHOICES = [
-        (DISCOUNT_TYPE_PERCENT, 'Percentage'),
-        (DISCOUNT_TYPE_FIXED, 'Fixed amount'),
-    ]
-
-    code = models.CharField(max_length=50, unique=True)
-    discount_type = models.CharField(max_length=10, choices=DISCOUNT_TYPE_CHOICES)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    min_order_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    active = models.BooleanField(default=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.code
-
-    def is_valid_for_total(self, total):
-        if not self.active:
-            return False
-        today = timezone.now().date()
-        if self.start_date and today < self.start_date:
-            return False
-        if self.end_date and today > self.end_date:
-            return False
-        return total >= self.min_order_total
-
-    def calculate_discount(self, total):
-        if self.discount_type == self.DISCOUNT_TYPE_PERCENT:
-            return min(total, (total * self.amount) / 100)
-        return min(total, self.amount)
+# Coupon model removed — feature disabled
 
 
 class Favorite(models.Model):
@@ -120,7 +88,7 @@ class Order(models.Model):
     message = models.TextField(blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    coupon = models.ForeignKey(Coupon, null=True, blank=True, on_delete=models.SET_NULL)
+    # coupon field removed
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
