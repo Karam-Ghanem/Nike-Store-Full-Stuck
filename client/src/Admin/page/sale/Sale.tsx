@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainHead from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Button,
@@ -34,7 +34,7 @@ const Sale = () => {
       <Toaster />
 
       <Box mt={{ base: 2, md: -10 }}>
-        <MainHead head="Sales" />
+        <MainHead title="Sales" />
       </Box>
 
       {/* TYPE SELECTOR */}

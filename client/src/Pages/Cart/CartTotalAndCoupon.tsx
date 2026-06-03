@@ -2,10 +2,12 @@ import { Button, Card, Flex, GridItem, Heading, Separator, Text, VStack } from "
 import { Link } from "react-router-dom"
 import useCartStore from "./cartStore";
 import CartCoupon from "./CartCoupon";
+// import { useState } from "react";
 
 const CartTotalAndCoupon = () => {
 
-      const { cartItems } =useCartStore();
+  const { cartItems,isDiscounted } =useCartStore();
+  // const [isDiscounted,setIsDiscounted] = useState<boolean>()
 
   return (
     <>
@@ -52,7 +54,7 @@ const CartTotalAndCoupon = () => {
                             item.currentShoseQuantity *
                               parseFloat(item.product.productPrice),
                           0
-                        )}{" "}
+                        )*2}{" "}
                         $
                       </Text>
                     </Flex>
@@ -65,10 +67,18 @@ const CartTotalAndCoupon = () => {
                         others
                       </Text>
                       <Text
+                      color={'red.500'}
                         fontWeight="semibold"
                         fontSize={{ base: "xs", md: "sm" }}
                       >
-                        0 $
+                        
+                        {isDiscounted ?  `Discounted ${cartItems.reduce(
+                          (acc, item) =>
+                            acc +
+                            item.currentShoseQuantity *
+                              parseFloat(item.product.productPrice),
+                          0
+                        )} $` : '0 $'}
                       </Text>
                     </Flex>
 
@@ -86,18 +96,25 @@ const CartTotalAndCoupon = () => {
                         color="#7008e7"
                         fontSize={{ base: "sm", md: "md" }}
                       >
-                        {cartItems.reduce(
+                        {isDiscounted ? cartItems.reduce(
                           (acc, item) =>
                             acc +
                             item.currentShoseQuantity *
                               parseFloat(item.product.productPrice),
                           0
-                        )}{" "}
+                        ) : 
+                          cartItems.reduce(
+                          (acc, item) =>
+                            acc +
+                            item.currentShoseQuantity *
+                              parseFloat(item.product.productPrice),
+                          0
+                        )
+                        }
                         $
                       </Text>
                     </Flex>
                   </VStack>
-
                   <Button
                     mt={6}
                     w="100%"

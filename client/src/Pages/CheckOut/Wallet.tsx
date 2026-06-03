@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Button,
@@ -34,7 +34,7 @@ const Wallet = () => {
   return (
     <>
       <Toaster />
-      <MainHead head={data.head} />
+      <MainTitle title={data.head} />
       <Box paddingTop={0}>
         <Box bg={"#f3f4f6"} padding={10}>
           <VStack>

@@ -1,11 +1,11 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
-import MainHead from "../PublicCompontents/MainHead";
+import MainTitle from "../PublicCompontents/MainTitle";
 import View360 from "./View360";
 
 const About = () => {
   return (
     <>
-      <MainHead head="WEB ABOUT" />
+      <MainTitle title="WEB ABOUT" />
       <VStack>
         <View360/>
         <Box

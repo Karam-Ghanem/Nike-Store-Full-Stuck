@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import useReviewStore from "@/Pages/Review/reviewStore";
 import {
   Box,
@@ -16,8 +16,8 @@ const UsersReview = () => {
 
   return (
     <>
-      <MainHead
-        head="USERS REVIEWS"
+      <MainTitle
+        title="USERS REVIEWS"
       />
 
       <SimpleGrid

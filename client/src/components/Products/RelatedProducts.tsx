@@ -2,7 +2,6 @@ import { Box, IconButton, Text } from "@chakra-ui/react";
 import { SimpleGrid } from "@chakra-ui/react";
 import { Card, Image } from "@chakra-ui/react";
 import { FaHeart } from "react-icons/fa";
-import ProductsList from "./Products Data/productsList";
 import { Link } from "react-router-dom";
 import PurchaseProcess from "./PurchaseProcess";
 
@@ -12,13 +11,13 @@ import useRelatedProducts from "./Hooks/useRelatedProducts";
 
 const RelatedProducts = () => {
 
-  const {addProductToFavList,category,deleteProductFromFav,favItems,setFavItems} = useRelatedProducts()
+  const {addProductToFavList,category,deleteProductFromFav,favItems,setFavItems,products} = useRelatedProducts()
 
   return (
     <>
       <Toaster />
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 3, xl: 4 }} gap="10px">
-        {ProductsList.map(
+        {products.map(
           (item) =>
             item.category == category && (
               <Card.Root

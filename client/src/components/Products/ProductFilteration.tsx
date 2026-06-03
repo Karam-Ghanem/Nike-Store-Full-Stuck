@@ -24,12 +24,6 @@ const ProductFilteration = ({isAnimating}:Props) => {
       Filteration,
       
     } = useFilterAndSearch(isAnimating);
-
-
-
-
-
-
   return (
     <>
       <HStack justifyContent={"space-around"}>

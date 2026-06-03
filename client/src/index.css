@@ -17,10 +17,46 @@
   scroll-behavior: smooth;
 }
 
-body {
+ body {
   zoom: 100%;
 transform: scale(0.8);
   transform-origin: top left;
   width: 125%;
   height: 100vh;
-} */
+}  */
+
+/* ----------------------------- */
+/*   Chrome / Edge / Safari      */
+/* ----------------------------- */
+
+/* ----------------------------- */
+/*   Chrome / Edge / Safari      */
+/* ----------------------------- */
+
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3d1f4;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b55ac0;
+  border-radius: 12px;
+  border: 3px solid #f3d1f4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9e3fa9;
+}
+
+/* ----------------------------- */
+/*           Firefox             */
+/* ----------------------------- */
+
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #b55ac0 #f3d1f4;
+}

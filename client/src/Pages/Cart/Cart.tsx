@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Grid,
@@ -15,7 +15,7 @@ const Cart = () => {
   if (cartItems.length < 1) {
     return (
       <Box minHeight={{base:'auto',sm:'300px'}}>
-        <MainHead head="No Products To Show" />
+        <MainTitle title="No Products To Show" />
       </Box>
     );
   }
@@ -23,7 +23,7 @@ const Cart = () => {
   return (
     <>
       <Toaster />
-        <MainHead head="Cart" />
+        <MainTitle title="Cart" />
         <Box
           mx="auto"
           borderRadius="lg"

@@ -32,6 +32,7 @@ const useFilterAndSearch = (isAnimating:(animate:boolean)=>void)=>{
 
     const [selectedCategory, setSelectedCategry] = useState("");
     const [selectedGender, setSelectedGender] = useState("");
+    
     const [query, setQuery] = useState<Query>({selectedCategory: "",selectedGender: "",});
     const { Filteration } = useProductStore();
 

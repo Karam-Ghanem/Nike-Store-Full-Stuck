@@ -49,13 +49,10 @@ function AutoLocate({
     navigator.geolocation.getCurrentPosition((pos) => {
       const { latitude, longitude } = pos.coords;
 
-      // حط الـ Marker على موقع المستخدم
       setPosition({ lat: latitude, lng: longitude });
 
-      // حرّك الخريطة لموقع المستخدم
       map.setView([latitude, longitude], 16);
 
-      // رجّع الإحداثيات للأب
       onChange({ lat: latitude, lng: longitude });
     });
   }, []);

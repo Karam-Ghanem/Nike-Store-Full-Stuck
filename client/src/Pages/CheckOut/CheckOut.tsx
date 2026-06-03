@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainHead from "@/components/PublicCompontents/MainTitle";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import CheckOutForm from "./CheckOutForm";
 import MyMap from "./MyMap";
@@ -32,7 +32,7 @@ const {setAdressForm,setSite} = useCheckOut()
 
   return (
     <>
-      <MainHead head="CHECK OUT" />
+      <MainHead title="CHECK OUT" />
       <SimpleGrid columns={{ base: 1, sm: 1, md: 2 }} gap="40px">
         <Box>
           <CheckOutForm sendAdressForm={(adress) => setAdressForm(adress)} />

@@ -12,7 +12,7 @@ const CartTable = () => {
       const { deleteProductFromCart, cartItems, setCurrentChoseQuantity } = useCartStore();
   return (
     <>
-                <GridItem>
+            <GridItem>
               <Card.Root borderRadius="lg" overflow="hidden">
                 <Box>
                   <Table.Root w="100%" tableLayout="fixed">

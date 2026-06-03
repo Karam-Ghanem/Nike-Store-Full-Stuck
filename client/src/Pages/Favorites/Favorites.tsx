@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Flex,
@@ -19,7 +19,7 @@ const Favorites = () => {
   if (favoritesItems.length < 1) {
     return (
       <Box minHeight={{ base: "auto", sm: "300px" }}>
-        <MainHead head="No Products To Show" />;
+        <MainTitle title="No Products To Show" />;
       </Box>
     );
 
@@ -28,7 +28,7 @@ const Favorites = () => {
   return (
     <>
       <Toaster />
-      <MainHead head="Favorites" />
+      <MainTitle title="Favorites" />
 
       <Box mx="auto" p={{ base: 2, md: 6 }}>
         <Flex direction="column" gap={6}>

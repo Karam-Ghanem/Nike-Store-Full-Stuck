@@ -10,7 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import AddToCartButton from "../PublicCompontents/AddToCartButton";
-import MainHead from "../PublicCompontents/MainHead";
+import MainTitle from "../PublicCompontents/MainTitle";
 import RelatedProducts from "./RelatedProducts";
 import View360 from "../About/View360";
 import { Toaster, toaster } from "@/components/ui/toaster";
@@ -152,7 +152,7 @@ const SingleProduct = ({isAdmin}:Props) => {
 
             <Button
               onClick={() => {
-                deleteProductFromCart(currentProduct?.id + chosenSize);
+                deleteProductFromCart(currentProduct?.id+'-' + chosenSize);
                 toaster.create({
                   title: "Product Deleted From your Cart Successfully!",
                   type: "success",
@@ -162,7 +162,7 @@ const SingleProduct = ({isAdmin}:Props) => {
               display={
                 cartItems
                   .map((item) => item.currentShoeseID)
-                  .includes(currentProduct?.id + chosenSize)
+                  .includes(currentProduct?.id+'-' + chosenSize)
                   ? "block"
                   : "none"
               }
@@ -179,12 +179,12 @@ const SingleProduct = ({isAdmin}:Props) => {
       </SimpleGrid>
 
       {/* 360° View */}
-      <MainHead head=" 360° View" />
+      <MainTitle title=" 360° View" />
       <View360 />
 
       {/* Related Products */}
       <Box display={isAdmin ? "none" : "block"}>
-        <MainHead head="Related Products" />
+        <MainTitle title="Related Products" />
         <RelatedProducts />
       </Box>
     </>

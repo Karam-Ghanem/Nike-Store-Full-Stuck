@@ -31,6 +31,8 @@ import Sale from "./page/sale/Sale";
 import SingleProduct from "@/components/Products/SingleProduct";
 import UsersReview from "./page/usersReviews/UsersReview";
 import Archive from "./page/archive/Archive";
+import SetCoupon from "./page/Coupon/SetCoupon";
+import ReturnPolicy from "./page/Replacement/ReturnPolicy";
 const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
@@ -67,11 +69,11 @@ export default function AdminApp() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route
                 path="addproduct"
-                element={<AddProduct head="ADD PRODUCT" />}
+                element={<AddProduct title="ADD PRODUCT" />}
               />
               <Route
                 path="editproduct/:id"
-                element={<AddProduct head="EDIT PRODUCT" />}
+                element={<AddProduct title="EDIT PRODUCT" />}
               />
               <Route
                 path="edit_delete_product"
@@ -79,10 +81,12 @@ export default function AdminApp() {
               />
               <Route path="sale/:id?" element={<Sale />} />
               <Route path="archive" element={<Archive />} />
-              <Route
-                path="/archive/:id/:category"
-                element={<SingleProduct isAdmin={true} />}
-              />
+              <Route path="/archive/:id/:category"element={<SingleProduct isAdmin={true} />}/>
+
+              <Route path="coupon" element={<SetCoupon/>} />
+              <Route path="return-policy" element={<ReturnPolicy/>} />
+
+
               <Route path="usersReview" element={<UsersReview />} />
               <Route path="team" element={<Team />} />
               <Route path="contacts" element={<Contacts />} />

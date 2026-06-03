@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainHead from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Button,
@@ -19,10 +19,10 @@ import type { ChangeEvent } from "react";
 import useProductAdmin from "@/Admin/Hooks/useProductAdmin";
 
 interface Props {
-  head: string;
+  title: string;
 }
 
-const AddProduct = ({ head }: Props) => {
+const AddProduct = ({ title }: Props) => {
   const {
     Sizes,
     addProduct,
@@ -40,7 +40,7 @@ const AddProduct = ({ head }: Props) => {
       <Toaster />
 
       <MainHead
-        head={head}
+        title={title}
       />
 
       <Box padding={4}>
@@ -417,7 +417,7 @@ const AddProduct = ({ head }: Props) => {
             color="white"
             fontSize={{ base: "14px", sm: "16px", md: "18px" }}
           >
-            {head}
+            {title}
           </Button>
         </form>
       </Box>

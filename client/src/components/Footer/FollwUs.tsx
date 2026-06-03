@@ -10,7 +10,7 @@ import FooterTitle from "./FooterTitle";
 const FollwUs = () => {
   return (
     <Box marginBottom={{ base: 6, sm: 6, lg: 0 }}>
-      <FooterTitle head="Follow Us" />
+      <FooterTitle title="Follow Us" />
       <HStack maxWidth={'250px'} justifyContent={'space-between'}>
         <FaFacebookF />
         <FaTwitter />

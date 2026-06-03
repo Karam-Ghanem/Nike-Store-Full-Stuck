@@ -1,14 +1,14 @@
 import { Heading } from "@chakra-ui/react";
 
 interface Props{
-  head:string;
+  title:string;
 }
 
-const FooterTitle = ({head}:Props) => {
+const FooterTitle = ({title}:Props) => {
   return (
     <>
       <Heading marginBottom={4} size={"3xl"} color={"#1d0180"}>
-        {head}
+        {title}
       </Heading>
     </>
   );
