@@ -5,7 +5,6 @@ interface productStore{
     favoritesItems:Product [];
     addProductToFavList:(product:Product)=>void;
     deleteProductFromFav:(productID:string)=>void;
-    // setFavoritesItems:(productID:string,newQuantityValue:number)=>void;
 }
 const useFavoriteStore =create<productStore>(set=>({
     favoritesItems:[],
@@ -15,10 +14,6 @@ const useFavoriteStore =create<productStore>(set=>({
     deleteProductFromFav:(productID)=>set((store)=>({
         favoritesItems:store.favoritesItems.filter((prod)=>prod.id!=productID)
     })),
-    // setFavoritesItems:(productID,newQuantityValue)=>set((store)=>({
-    //     // favoritesItems:[...store.favoritesItems.map((product)=>{if(product.id===productID)product.quantity=newQuantityValue; return product})]
-    //     favoritesItems:[...store.favoritesItems.map((product)=>{if(product.id===productID)product.sizesAndQuantities=newQuantityValue; return product})]
-    // }))
 }))
 
 export default useFavoriteStore;

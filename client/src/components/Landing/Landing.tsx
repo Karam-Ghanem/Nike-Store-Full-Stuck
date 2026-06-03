@@ -6,7 +6,7 @@ import About from "../About/About";
 import TextReview from "../../Pages/Review/TextReview";
 import Services from "@/Pages/Services/Services";
 import WelcomeBack from "../WelcomeBack/WelcomeBack";
-import MainHead from "../PublicCompontents/MainHead";
+import MainTitle from "../PublicCompontents/MainTitle";
 
 const Landing = () => {
 
@@ -79,7 +79,7 @@ const Landing = () => {
       {/* Web About */}
       <About />
       {/* Review */}
-      <MainHead head="REVIEWS" />
+      <MainTitle title="REVIEWS" />
       <TextReview />
       {/* Services */}
       <Services />

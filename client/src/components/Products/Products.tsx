@@ -1,5 +1,5 @@
 import { Box, Container, Flex, HStack, IconButton, Spinner, Text } from "@chakra-ui/react";
-import MainHead from "../PublicCompontents/MainHead";
+import MainTitle from "../PublicCompontents/MainTitle";
 import { SimpleGrid } from "@chakra-ui/react";
 import { Card, Image } from "@chakra-ui/react";
 import { FaHeart } from "react-icons/fa";
@@ -42,14 +42,14 @@ const Products = ({ homePage,edit_delete }: Props) => {
 
   return (
     <>
-      <MainHead head="PRODUCTS" />
+      <MainTitle title="PRODUCTS" />
 
       {!homePage && (
         <ProductControls isAnimating={(animate) => setIsAnimating(animate)} />
       )}
 
       <Container>
-        {products.length < 1 && <MainHead head="No Products To Show" />}
+        {products.length < 1 && <MainTitle title="No Products To Show" />}
 
         {isAnimating ? (
           <Flex justifyContent={"center"} marginTop={100}>
@@ -86,7 +86,7 @@ const Products = ({ homePage,edit_delete }: Props) => {
                     favItems.includes(item.id) ? "pink" : "#f6f6f6"
                   }`}
                   className="shadow-xl shadow-blue-500/50"
-                  _hover={{ margin: "-0.5px 0 0 -2px" }}
+                  _hover={{ margin: "-0.5px 0 0 -0.5px" }}
                   transition="0.3s"
                 >
                   <Link to={`/${item.href}${item.id}/${item.category}`}>

@@ -7,12 +7,11 @@ import type { CatrtItem } from "@/Pages/Cart/cartStore";
 
 
 interface ProductStore{
-    products:Product[],
+  products:Product[],
+  Filteration: (query: Query) => void,
     archivedProducts:Archive[],
-    Filteration:(query:Query)=>void,
     Searching:(textSearch:string)=>void,
     addProduct:(product:Product)=>void,
-    // deleteProduct:(productID:string|Product)=>void,
     removeFromArchive:(productID:string)=>void;
     archiveProduct:(product:Product)=>void,
     editProduct:(productID:string,product:Product)=>void,
@@ -51,23 +50,17 @@ const useProductStore = create<ProductStore>(set=>({
     addProduct:(product)=>set((store)=>({
         products:[...store.products,product]
     })),
-    // deleteProduct:(productID)=>set((store)=>({
-    //     products:
-    //     store.products.filter((product)=>product.id!==productID)
-    // })),
     archiveProduct:(produc)=>set((store)=>(
         
         {
         products:store.products.map(p=>p.id===produc.id ? {...p,isArchived:true} : p),
         archivedProducts:[...store.archivedProducts,{product:{...produc},date:new Date()}]
         }
-)),
-removeFromArchive:(productID)=>set((store)=>({
+    )),
+    removeFromArchive:(productID)=>set((store)=>({
     archivedProducts:[...store.archivedProducts.filter(arpr=>arpr.product.id!==productID)],
     products:store.products.map(p=>p.id===productID ? {...p,isArchived:false} : p),
-})),
-
-
+    })),
     editProduct:(productID,product)=>set((store)=>({
         products:
         store.products.map((prod)=>prod.id==productID ?
@@ -88,7 +81,6 @@ removeFromArchive:(productID)=>set((store)=>({
          :
           prod)
     })),
-
     applyDiscount:(on,percent)=>set((store)=>(
         on!='All' ? 
         {
@@ -114,8 +106,8 @@ removeFromArchive:(productID)=>set((store)=>({
         .toString()+' $'}))
         }
         )
-        ),
-        applyDiscountOnShoese:(productID,percent)=>set((store)=>(        {
+    ),
+    applyDiscountOnShoese:(productID,percent)=>set((store)=>(        {
         products:
         store.products.map(product=>(product.id===productID) ? {
         ...product,
@@ -128,19 +120,7 @@ removeFromArchive:(productID)=>set((store)=>({
         .toString()+'$'
         }
     : { ...product } )
-         })),
-
-
-
-
-
-
-
-
-
-
-
-
+    })),
 decreaseStock: (cartItems) =>
   set((store) => {
     // 1) تحويل cartItems إلى بيانات واضحة
@@ -187,23 +167,6 @@ decreaseStock: (cartItems) =>
 
     return { products: updatedProducts };
   }),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        }))
+ }))
 
 export default useProductStore;

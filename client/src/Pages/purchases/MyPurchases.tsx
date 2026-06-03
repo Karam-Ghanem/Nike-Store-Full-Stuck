@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Flex,
@@ -29,14 +29,14 @@ const MyPurchases = () => {
   if (myPurchases.length < 1) {
     return (
       <Box minHeight={{ base: "auto", sm: "300px" }}>
-        <MainHead head="No Products To Show" />
+        <MainTitle title="No Products To Show" />
       </Box>
     );
   }
 
   return (
     <>
-      <MainHead head="MY PURCHASES" />
+      <MainTitle title="MY PURCHASES" />
 
       <Box maxW="1100px" mx="auto" p={{ base: 2, md: 6 }}>
         <Flex direction="column" gap={6}>

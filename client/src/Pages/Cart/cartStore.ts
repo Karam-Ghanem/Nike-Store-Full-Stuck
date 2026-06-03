@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+ import { create } from 'zustand'
 import type { Product } from '@/components/Products/Products Data/productsList';
 
 
@@ -6,7 +6,7 @@ import type { Product } from '@/components/Products/Products Data/productsList';
 export interface CatrtItem{
     product:Product;
     currentShoseSize:string;
-    currentShoseQuantity:number ;
+    currentShoseQuantity:number;
     currentShoeseID:string;
 }
 
@@ -15,18 +15,25 @@ interface cartStore{
     myPurchases:CatrtItem[];
     purchaseDate:Date ;
     currentShoeseQuantity:number;
+    isDiscounted:boolean;
+    setIsDiscounted:(isDiscounted:boolean)=>void
     addProductToCart:(product:Product,currentShoseSize:string,currentShoeseQuantity:number,currentShoeseID:string)=>void;
     setCurrentChoseQuantity:(currentShoeseID:string,currentShoeseQuantity:number)=>void;
     deleteProductFromCart:(currentShoeseID:string)=>void;
     getTotalPrice:(cartItems:CatrtItem[])=>number;
     addProductsToMyPurchases:(myPurchases:CatrtItem[],purchaseDate:Date)=>void;
     returnProduct:(productID:string | Product)=>void;
+    editProductPriceAfterUseCoupon:()=>void;
 }
 const useCartStore =create<cartStore>(set=>({
     cartItems:[],
     myPurchases:[],
     purchaseDate:new Date(),
     currentShoeseQuantity:0,
+    isDiscounted:false,
+    setIsDiscounted:(isDiscounted)=>set(()=>({
+        isDiscounted:isDiscounted
+    })),
     addProductToCart:(product,currentShoeseSize,currentShoeseQuantity,currentShoeseID)=>set((store)=>({
         cartItems:[...store.cartItems,{product: product,currentShoseSize: currentShoeseSize,currentShoseQuantity:currentShoeseQuantity,currentShoeseID:currentShoeseID}]
     })),
@@ -55,8 +62,18 @@ const useCartStore =create<cartStore>(set=>({
     returnProduct:(productID)=>set((store)=>({
         myPurchases:store.myPurchases.filter((prod)=>prod.currentShoeseID!=productID),
         cartItems:store.cartItems.filter((prod)=>prod.currentShoeseID!=productID)
-
+    })),
+    editProductPriceAfterUseCoupon:()=>set((store)=>({
+        cartItems:store.cartItems.map((cartItem)=>{
+            const discountedPrice = parseFloat(cartItem.product.productPrice) / 2;
+            return {
+                ...cartItem,
+                product: {
+                    ...cartItem.product,
+                    productPrice: `${discountedPrice}$`,
+                },
+            };
+        })
     }))
 }))
-
 export default useCartStore;

@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import { Box, Button, Card, Container, Image, SimpleGrid } from "@chakra-ui/react";
 import paymentMethod from "./Data/PaymentMethod";
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ const Pay  = () => {
 
   return (
     <>
-      <MainHead head="PAYMENT" />
+      <MainTitle title="PAYMENT" />
       <Container>
         <SimpleGrid columns={{base:1,sm:1,md:2,lg:2}} gap={20}>
           {paymentMethod.map((payment) => (

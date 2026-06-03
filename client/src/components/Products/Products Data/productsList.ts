@@ -12,8 +12,6 @@ export interface SizeAndQuantity{
     Size:string;
     quantity:number;    
 }
-
-
 export interface Product{
     id: string;
     productImg: string | undefined;

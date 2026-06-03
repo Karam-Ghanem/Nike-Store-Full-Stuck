@@ -1,5 +1,5 @@
 import { Heading, SimpleGrid, Box, Text, Container } from "@chakra-ui/react";
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainTitle from "@/components/PublicCompontents/MainTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ServicesData from "./ServicesData";
 import {components} from "./ServicesData";
@@ -9,7 +9,7 @@ const Services = () => {
 
   return (
     <Container>
-      <MainHead head="OUR SERVICES" />
+      <MainTitle title="OUR SERVICES" />
       <SimpleGrid
         columns={{ base: 1, sm: 1, md: 3, lg: 3, xl: 3 }}
         gap="0px"

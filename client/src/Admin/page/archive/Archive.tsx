@@ -1,4 +1,4 @@
-import MainHead from "@/components/PublicCompontents/MainHead";
+import MainHead from "@/components/PublicCompontents/MainTitle";
 import {
   Box,
   Flex,
@@ -18,14 +18,14 @@ const Archive = () => {
   if (archivedProducts.length < 1) {
     return (
       <Box minHeight={{ base: "auto", sm: "300px" }}>
-        <MainHead head="No Products To Show" />
+        <MainHead title="No Products To Show" />
       </Box>
     );
   }
 
   return (
     <>
-      <MainHead head="Archive" />
+      <MainHead title="Archive" />
 
       <Box mx="auto" p={{ base: 1, sm: 2, md: 4 }}>
         <Flex direction="column" gap={4}>

@@ -9,7 +9,7 @@ const FooterContact = () => {
 
   return (
     <Box marginBottom={{ base: 6, sm: 6, lg: 0 }}>
-      <FooterTitle head="Contact" />
+      <FooterTitle title="Contact" />
       <List.Root gap="2" variant="plain" align="center">
         <List.Item>
           <List.Indicator asChild color="#ba1e9a">
