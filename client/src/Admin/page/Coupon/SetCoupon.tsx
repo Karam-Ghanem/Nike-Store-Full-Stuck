@@ -56,31 +56,31 @@ const SetCoupon = () => {
                   fontWeight="500"
                   color={cellColor}
                 >
-                    <Flex justifyContent={'space-between'}>
-                        {coupon.coupon}
-                                <Text
-                                _hover={{
-                                  cursor: "pointer",
-                                  bg: "red",
-                                  color: "white",
-                                  border: "none",
-                                }}
-                                transition="0.3s"
-                                px={2}
-                                marginLeft={{ base: -4 }}
-                                border="1px solid #333"
-                                fontSize={{
-                                  base: "7px",
-                                  sm: "12px",
-                                  md: "16px",
-                                  lg: "18px",
-                                }}
-                                onClick={() => {
-                                    removeCoupon(coupon.id)
-                                }}
-                              >
-                                X
-                              </Text>
+                  <Flex justifyContent={'space-between'}>
+                      {coupon.coupon}
+                              <Text
+                              _hover={{
+                                cursor: "pointer",
+                                bg: "red",
+                                color: "white",
+                                border: "none",
+                              }}
+                              transition="0.3s"
+                              px={2}
+                              marginLeft={{ base: -4 }}
+                              border="1px solid #333"
+                              fontSize={{
+                                base: "7px",
+                                sm: "12px",
+                                md: "16px",
+                                lg: "18px",
+                              }}
+                              onClick={() => {
+                                  removeCoupon(coupon.id)
+                              }}
+                            >
+                              X
+                            </Text>
                     </Flex>
                   
                 </Table.Cell>
