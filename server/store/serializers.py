@@ -9,7 +9,6 @@ from .models import (
     Order,
     OrderItem,
     Review,
-    Coupon,
 )
 
 
@@ -106,48 +105,24 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
     def get_total_price(self, obj):
-        subtotal = sum(item.price * item.quantity for item in obj.items.all())
-        if obj.coupon:
-            try:
-                discount = obj.coupon.calculate_discount(subtotal)
-            except Exception:
-                discount = 0
-            return float(subtotal - discount)
-        return float(subtotal)
+        return float(sum(item.price * item.quantity for item in obj.items.all()))
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     items = OrderItemCreateSerializer(many=True)
-    coupon_code = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Order
         fields = [
             'full_name', 'email', 'phone', 'message', 'latitude', 'longitude',
-            'items', 'coupon_code',
+            'items',
         ]
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
-        coupon_code = validated_data.pop('coupon_code', None)
-
-        # calculate subtotal to validate coupon
-        subtotal = 0
-        for item in items_data:
-            product = item['product']
-            subtotal += float(product.price) * int(item['quantity'])
-
-        coupon = None
-        if coupon_code:
-            try:
-                coupon = Coupon.objects.get(code__iexact=coupon_code, active=True)
-                if not coupon.is_valid_for_total(subtotal):
-                    coupon = None
-            except Exception:
-                coupon = None
 
         user = validated_data.pop('user', self.context['request'].user)
-        order = Order.objects.create(**validated_data, user=user, coupon=coupon)
+        order = Order.objects.create(**validated_data, user=user)
         for item_data in items_data:
             product = item_data['product']
             product_size = item_data['product_size']
@@ -162,12 +137,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             product_size.stock = max(product_size.stock - quantity, 0)
             product_size.save()
         return order
-
-
-class CouponSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Coupon
-        fields = ['id', 'code', 'discount_type', 'amount', 'min_order_total', 'active', 'start_date', 'end_date']
 
 
 class UserSerializer(serializers.ModelSerializer):
