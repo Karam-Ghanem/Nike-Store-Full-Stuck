@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from .models import Category, Product, Favorite, CartItem, Order, OrderItem, Review, Coupon
+from .models import Category, Product, Favorite, CartItem, Order, OrderItem, Review
 from .serializers import (
     CategorySerializer,
     ProductSerializer,
@@ -17,8 +17,6 @@ from .serializers import (
     UserSerializer,
     RegisterSerializer,
 )
-
-from .serializers import CouponSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 
@@ -137,27 +135,6 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-
-class CouponViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Coupon.objects.all()
-    serializer_class = CouponSerializer
-    permission_classes = [permissions.AllowAny]
-
-    @action(detail=False, methods=['post'])
-    def apply(self, request):
-        code = request.data.get('code')
-        total = request.data.get('total')
-        if not code:
-            return Response({'detail': 'code is required'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            coupon = Coupon.objects.get(code__iexact=code)
-        except Coupon.DoesNotExist:
-            return Response({'valid': False, 'detail': 'Invalid code'}, status=status.HTTP_200_OK)
-        if not coupon.is_valid_for_total(float(total) if total else 0):
-            return Response({'valid': False, 'detail': 'Coupon not valid for this total'}, status=status.HTTP_200_OK)
-        discount = coupon.calculate_discount(float(total) if total else 0)
-        return Response({'valid': True, 'discount': float(discount), 'code': coupon.code}, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
