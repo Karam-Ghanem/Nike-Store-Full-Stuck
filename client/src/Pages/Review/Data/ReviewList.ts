@@ -5,6 +5,7 @@ import Zein from "@/assets/Zein.jpg";
 import Hadi from "@/assets/Hadi.jpg";
 import Soliman from "@/assets/Soliman.jpg";
 import Mayyas from "@/assets//Mayas.jpg";
+
   export interface ReviewType {
   name: string;
   img: string | undefined;

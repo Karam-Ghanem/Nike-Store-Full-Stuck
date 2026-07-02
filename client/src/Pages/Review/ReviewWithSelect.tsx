@@ -59,9 +59,7 @@ const ReviewWithSelect = () => {
                                     prev.map((item) => {
                                       if (item.qustion !== cba.qustion)
                                         return item;
-
                                       const current = item.answersSelected;
-
                                       return {
                                         ...item,
                                         answersSelected: checked
@@ -133,10 +131,8 @@ const ReviewWithSelect = () => {
                     type="submit"
                     onClick={(e) => {
                       e.preventDefault();
-
                       addCheckBoxEvalute(checkBoxState);
                       addRadioEvalute(radioState);
-
                       // RESET STATES AFTER SUBMIT
                       setCheckBoxState((prev) =>
                         prev.map((item) => ({
@@ -144,14 +140,12 @@ const ReviewWithSelect = () => {
                           answersSelected: [],
                         }))
                       );
-
                       setRadioState((prev) =>
                         prev.map((item) => ({
                           ...item,
                           selected: "",
                         }))
                       );
-
                       toaster.create({
                         title: "Your review has been submitted successfully",
                         type: "success",

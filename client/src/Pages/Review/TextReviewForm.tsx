@@ -43,7 +43,7 @@ const TextReviewForm = () => {
             color={"#7008e7"}
             fontSize={{ base: 15, sm: 20, md: 25, lg: 30 }}
           >
-            To submit your comment, please provide a photo of your personal ID :
+          To submit your comment, please provide a photo of your personal ID :
           </Text>
           <form action="">
             <label

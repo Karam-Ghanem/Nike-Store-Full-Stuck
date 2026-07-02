@@ -27,10 +27,6 @@ const Wallet = () => {
 
   const {addProductsToMyPurchases,cartItems,data,decreaseStock,getTotalPrice,navigate,setTransactionData,transactionData} = useWallet()
 
-
-
-
-
   return (
     <>
       <Toaster />

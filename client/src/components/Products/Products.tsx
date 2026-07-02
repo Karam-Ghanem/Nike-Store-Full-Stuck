@@ -72,7 +72,9 @@ const Products = ({ homePage,edit_delete }: Props) => {
             >
               {actualProductList.map((item) => (
                 <Card.Root
+                
                   display={item.isArchived ? "none" : "block"}
+
                   marginTop={4}
                   cursor="pointer"
                   maxW="2xl"

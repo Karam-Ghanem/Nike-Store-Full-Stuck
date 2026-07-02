@@ -188,7 +188,7 @@ const Sale = () => {
                 <Button
                   bg="red"
                   color="white"
-                  width={{ base: "40%", sm: "30%" }}
+                  width={{ base: "40%", sm: "40%" }}
                   fontSize={{
                     base: "12px",
                     sm: "14px",

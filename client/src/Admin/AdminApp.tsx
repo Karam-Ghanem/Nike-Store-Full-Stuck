@@ -76,7 +76,7 @@ export default function AdminApp() {
                 element={<AddProduct title="EDIT PRODUCT" />}
               />
               <Route
-                path="edit_delete_product"
+                path="edit_archive_product"
                 element={<Products edit_delete={true} homePage={false} />}
               />
               <Route path="sale/:id?" element={<Sale />} />
