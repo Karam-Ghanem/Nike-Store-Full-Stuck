@@ -74,6 +74,8 @@ const useCartStore =create<cartStore>(set=>({
                 },
             };
         })
-    }))
+    })),
+
+
 }))
 export default useCartStore;

@@ -394,7 +394,6 @@ const AddProduct = ({ title }: Props) => {
                 href: "product/",
                 productImg: undefined,
               });
-
               if (id) {
                 editProduct(id, newProduct);
                 toaster.create({

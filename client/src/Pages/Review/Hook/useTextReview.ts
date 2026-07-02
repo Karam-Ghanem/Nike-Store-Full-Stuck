@@ -12,9 +12,7 @@ const useTextReview = ()=>{
 
   const [selectedIDImg, setSelectedIDImage] = useState("");
   const [openForm,setOpenForm] = useState(false);
-  const [selectedPersonalImg, setSelectedPersonalImage] = useState<
-    string | undefined
-  >(undefined);
+  const [selectedPersonalImg, setSelectedPersonalImage] = useState<string | undefined>(undefined);
 
   const [singleReview, setSingleReview] = useState<ReviewType>({
     name: "",
@@ -25,7 +23,6 @@ const useTextReview = ()=>{
   const HandleIDImg = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const imageURL = URL.createObjectURL(file);
     setSelectedIDImage(imageURL);
   };

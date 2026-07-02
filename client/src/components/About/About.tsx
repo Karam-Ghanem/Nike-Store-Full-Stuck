@@ -29,7 +29,7 @@ const About = () => {
             }}
           >
             Welcome to Nike Store, your premier destination for authentic Nike
-            footwear in Lattakia, Syria. Established in 2024, we are committed
+            footwear in Lattakia, Syria. Established in 2025, we are committed
             to bringing you the latest and most stylish Nike sneakers for men
             and women, all 100% genuine and backed by quality assurance. At Nike
             Store, we pride ourselves on fast and reliable service, offering

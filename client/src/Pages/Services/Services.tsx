@@ -6,7 +6,7 @@ import {components} from "./ServicesData";
 
 const Services = () => {
 
-
+const ServicesDat = ServicesData();
   return (
     <Container>
       <MainTitle title="OUR SERVICES" />
@@ -15,7 +15,7 @@ const Services = () => {
         gap="0px"
         textAlign={"center"}
       >
-        {ServicesData.map((item) => {
+        {ServicesDat.map((item) => {
           return (
             <Box key={item.name} marginBottom={"70px"}>
               <Box marginBottom={"30px"}>

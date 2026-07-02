@@ -16,7 +16,6 @@ const Pay  = () => {
               key={payment.value}
               flexDirection="row"
               overflow="hidden"
-              // maxW="96"
             >
               <Image
                 width={{base:'100px',sm:'200px',md:'130px',lg:'180px'}}
