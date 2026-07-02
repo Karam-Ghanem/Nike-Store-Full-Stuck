@@ -1,5 +1,5 @@
   
-  import Syriatel from "@/assets/Syriatel.jpg";
+import Syriatel from "@/assets/Syriatel.jpg";
 import MTN from "@/assets/MTN.png";
 import ShamCash from "@/assets/ShamCash.jpg";
 import usdt from "@/assets/usdt.png";

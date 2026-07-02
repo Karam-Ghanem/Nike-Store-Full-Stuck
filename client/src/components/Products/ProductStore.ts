@@ -9,15 +9,16 @@ import type { CatrtItem } from "@/Pages/Cart/cartStore";
 interface ProductStore{
   products:Product[],
   Filteration: (query: Query) => void,
-    archivedProducts:Archive[],
-    Searching:(textSearch:string)=>void,
-    addProduct:(product:Product)=>void,
-    removeFromArchive:(productID:string)=>void;
-    archiveProduct:(product:Product)=>void,
-    editProduct:(productID:string,product:Product)=>void,
-    applyDiscount:(on:string,percent:number)=>void;
-    applyDiscountOnShoese:(productId:string,percent:number)=>void;
-    decreaseStock:(cartItem:CatrtItem[])=>void;
+  archivedProducts:Archive[],
+  Searching:(textSearch:string)=>void,
+  addProduct:(product:Product)=>void,
+  removeFromArchive:(productID:string)=>void;
+  archiveProduct:(product:Product)=>void,
+  editProduct:(productID:string,product:Product)=>void,
+  applyDiscount:(on:string,percent:number)=>void;
+  applyDiscountOnShoese:(productId:string,percent:number)=>void;
+  decreaseStock:(cartItem:CatrtItem[])=>void;
+  increaseStock: (returnedItem: CatrtItem) => void;
 }
 
 
@@ -48,7 +49,7 @@ const useProductStore = create<ProductStore>(set=>({
         ProductsList
     })),
     addProduct:(product)=>set((store)=>({
-        products:[...store.products,product]
+      products:[...store.products,product]
     })),
     archiveProduct:(produc)=>set((store)=>(
         
@@ -121,8 +122,8 @@ const useProductStore = create<ProductStore>(set=>({
         }
     : { ...product } )
     })),
-decreaseStock: (cartItems) =>
-  set((store) => {
+    decreaseStock: (cartItems) =>
+    set((store) => {
     // 1) تحويل cartItems إلى بيانات واضحة
     const purchased = cartItems.map(ci => {
       const [productId, size] = ci.currentShoeseID.split("-");
@@ -167,6 +168,34 @@ decreaseStock: (cartItems) =>
 
     return { products: updatedProducts };
   }),
+  increaseStock: (returnedItem) =>
+    set((store) => {
+      // استخراج productId و size من currentShoeseID
+      const [productId, size] = returnedItem.currentShoeseID.split("-");
+
+      // الكمية المُعادة
+      const quantity = returnedItem.currentShoseQuantity;
+
+      const updatedProducts = store.products.map((prod) => {
+        if (prod.id !== productId) return prod;
+
+        const updatedSizes = prod.sizesAndQuantities.map((sizeObj) => {
+          if (sizeObj.Size !== size) return sizeObj;
+
+          return {
+            ...sizeObj,
+            quantity: sizeObj.quantity + quantity, // زيادة الكمية
+          };
+        });
+
+        return {
+          ...prod,
+          sizesAndQuantities: updatedSizes,
+        };
+      });
+
+      return { products: updatedProducts };
+    }),
  }))
 
 export default useProductStore;

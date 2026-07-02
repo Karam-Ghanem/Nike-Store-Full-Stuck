@@ -6,11 +6,11 @@ import type {  CheckBoxItem , RadioItem} from "../Data/Qustions";
 const useCheckRadioReview = ()=>{
 
 
-    const [checkBoxState, setCheckBoxState] = useState<CheckBoxItem[]>(initialCheckBoxData);
-
-
+  const [checkBoxState, setCheckBoxState] = useState<CheckBoxItem[]>(initialCheckBoxData);
   const [radioState, setRadioState] = useState<RadioItem[]>(initialRadioData);
 
+
+  
   const { addCheckBoxEvalute, addRadioEvalute } = useReviewStore();
 
     return{

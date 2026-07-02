@@ -32,6 +32,7 @@ const UsersReview = () => {
             defaultValue={[]}
             padding={0}
             width="100%"
+            color={'#7008e7'}
           >
             <Accordion.Item value={`review-${index}`}>
               {/* TRIGGER */}

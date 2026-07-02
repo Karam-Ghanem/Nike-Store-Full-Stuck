@@ -6,10 +6,11 @@ import {components} from "./ServicesData";
 
 const Services = () => {
 
-
+  console.log("services")
+  alert("hi")
   return (
     <Box>
-      <MainHead head="OUR SERVICES" />
+      <MainHead head="OUww SERVICES" />
       <SimpleGrid
         columns={{ base: 1, sm: 1, md: 3, lg: 3, xl: 3 }}
         gap="0px"

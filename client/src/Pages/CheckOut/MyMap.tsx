@@ -34,7 +34,6 @@ const MyMap = ({sendAddress}:Props) => {
             <LocationPicker
               onChange={async (coords) => {
                 setLocation(coords);
-                // تحويل الإحداثيات لعنوان
                 const addr = await getAddress(coords.lat, coords.lng);
                 setAddress(addr);
                 sendAddress(address);

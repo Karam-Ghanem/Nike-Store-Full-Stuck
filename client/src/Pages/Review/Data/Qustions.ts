@@ -96,7 +96,7 @@ export type RadioItem = {
 
 
 
-  // RADIO DATA (مع selected)
+  // RADIO DATA 
   export const initialRadioData: RadioItem[] = [
     {
       qustion: "Rate the ease of using the website",

@@ -19,6 +19,7 @@ const useWallet = ()=>{
   type PaymentKey = keyof typeof paymentData;
 
   const data = paymentData[type as PaymentKey];
+
   const { getTotalPrice, cartItems,addProductsToMyPurchases } = useCartStore();
   const { decreaseStock } = useProductStore();
 

@@ -1,7 +1,8 @@
-  import { faTruckFast } from "@fortawesome/free-solid-svg-icons";
+import { faTruckFast } from "@fortawesome/free-solid-svg-icons";
 import { faRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { faHeadset } from "@fortawesome/free-solid-svg-icons"; 
-   
+import useReturnStore from "@/Admin/page/Replacement/ReturnStore";
+const { returnPeriod } = useReturnStore()
    
    const ServicesData = [
     {
@@ -10,7 +11,7 @@ import { faHeadset } from "@fortawesome/free-solid-svg-icons";
       description: " Your Nike shoes arrive swiftly within 24 hours locally! ",
     },
     {
-      name: "10 Days Replacement",
+      name: `${returnPeriod} Days Replacement`,
       img: "faRotateLeft",
       description: " Easy exchanges, no hassle your satisfaction guaranteed! ",
     },

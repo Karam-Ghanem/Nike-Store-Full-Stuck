@@ -24,6 +24,7 @@ const MyPurchases = () => {
     returnProduct,
     allowed,
     setAllowed,
+    increaseStock,
   } = useMyPurchase();
 
   if (myPurchases.length < 1) {
@@ -67,7 +68,7 @@ const MyPurchases = () => {
                       lg: "25px",
                     }}
                   >
-                    Product
+                    Product (Quantity)
                   </Table.ColumnHeader>
 
                   <Table.ColumnHeader
@@ -156,7 +157,7 @@ const MyPurchases = () => {
                           lg: "20px",
                         }}
                       >
-                        {product.product.productName}
+                        {product.product.productName+`(${product.currentShoseQuantity})`}
                       </Text>
                     </Table.Cell>
 
@@ -201,8 +202,8 @@ const MyPurchases = () => {
                         p={0}
                       >
                         {(new Date().getTime() - purchaseDate.getTime()) /
-                          1000 >
-                        returnPeriod ? (
+                          returnPeriod! >
+                        returnPeriod! ? (
                           allowed && (
                             <Text
                               color="red"
@@ -213,22 +214,26 @@ const MyPurchases = () => {
                                 lg: "20px",
                               }}
                             >
-                              {`Sorry You Can Not Replace After ${returnPeriod} Seconds`}
+                              {`Sorry You Can Not Replace After ${returnPeriod!} Days`}
                             </Text>
                           )
                         ) : (
                           <MainDialog
                             id={product.product.id}
                             parameter={product.currentShoeseID}
-                            completeTheProcess={(pro) => returnProduct(pro)}
+                            completeTheProcess={(pro) => 
+                            {
+                              increaseStock(product);
+                              returnProduct(pro);
+                            }}
                             theProces="Return"
                           >
                             <Button
                               disabled={
                                 (new Date().getTime() -
                                   purchaseDate.getTime()) /
-                                  1000 >
-                                returnPeriod
+                                  returnPeriod! >
+                                returnPeriod!
                               }
                               width={{
                                 base: "8px",
@@ -254,8 +259,8 @@ const MyPurchases = () => {
                         )}
 
                         {(new Date().getTime() - purchaseDate.getTime()) /
-                          1000 >
-                          returnPeriod && (
+                          returnPeriod! >
+                          returnPeriod! && (
                           <Text
                             pointerEvents={{ base: "none", md: "auto" }}
                             onClick={() => setAllowed(!allowed)}
@@ -272,8 +277,8 @@ const MyPurchases = () => {
           </Card.Root>
         </Flex>
 
-        {(new Date().getTime() - purchaseDate.getTime()) / 1000 >
-          returnPeriod && (
+        {(new Date().getTime() - purchaseDate.getTime()) / returnPeriod! >
+          returnPeriod! && (
           <HStack
             display={{ base: "flex", md: "none" }}
             marginTop={4}
@@ -281,7 +286,7 @@ const MyPurchases = () => {
             fontSize={10}
           >
             <MdInfoOutline /> :
-            {`Sorry You Can Not Replace After ${returnPeriod} Seconds`}
+            {`Sorry You Can Not Replace After ${returnPeriod!} Seconds`}
           </HStack>
         )}
       </Box>

@@ -56,11 +56,11 @@ const CartCoupon = () => {
         fontSize={{ base: 13, sm: 14, md: 14, lg: 15 }}
         _hover={{ bg: "#7008e7" }}
         onClick={()=>{
-            if(isDiscounted)
-                return 0;
-            setIsDiscounted(true)
-            editProductPriceAfterUseCoupon();
-            setEndCoupon(true)
+        if(isDiscounted)
+            return 0;
+        setIsDiscounted(true)
+        editProductPriceAfterUseCoupon();
+        setEndCoupon(true)
         }}
         >
         APPLY

@@ -5,13 +5,10 @@ import type { CheckBoxItem,RadioItem } from "./Data/Qustions";
 
 interface ReviewStore {
   reviews: ReviewType[];
-
   checkEvalutes: CheckBoxItem[][];
   radioEvalutes: RadioItem[][];
-
   addCheckBoxEvalute: (checkBoxEv: CheckBoxItem[]) => void;
   addRadioEvalute: (radioEv: RadioItem[]) => void;
-
   AddReview: (rev: ReviewType) => void;
 }
 

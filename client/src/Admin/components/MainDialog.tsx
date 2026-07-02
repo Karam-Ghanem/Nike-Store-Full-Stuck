@@ -18,7 +18,7 @@ const MainDialog = ({theProces,completeTheProcess,parameter,children,id}:Props) 
 const url = window.location.href;
 const isInMyPurchase = url.includes('mypurchase') ? true : false;
 const unArchived = url.includes("archive") ? true : false;
-const addedToArchive = url.includes("edit_delete_product") ? true : false;
+const addedToArchive = url.includes("edit_archive_product") ? true : false;
 const navigate = useNavigate()
 
   const [returnCause,setReturnCause] = useState('')

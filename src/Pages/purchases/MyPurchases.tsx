@@ -17,6 +17,7 @@ import MainDialog from "@/Admin/components/MainDialog";
 import useMyPurchase from "./Hook/useMyPrchase";
 
 const MyPurchases = () => {
+
   const {
     myPurchases,
     purchaseDate,
