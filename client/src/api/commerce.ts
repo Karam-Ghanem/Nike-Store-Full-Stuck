@@ -154,6 +154,7 @@ function productFormData(payload: ProductWritePayload) {
   form.append('price', payload.price.replace('$', '').trim());
   form.append('gender', payload.gender.toLowerCase() === 'women' || payload.gender.toLowerCase() === 'wommen' ? 'female' : payload.gender.toLowerCase() === 'men' ? 'male' : 'unisex');
   form.append('category_name', payload.categoryName);
+  form.append('is_active', 'true');
   form.append('sizes_data', JSON.stringify(payload.sizes));
   if (payload.imageFile) form.append('image', payload.imageFile);
   return form;

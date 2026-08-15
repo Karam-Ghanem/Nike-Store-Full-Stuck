@@ -87,8 +87,8 @@ class ProductSerializer(serializers.ModelSerializer):
         validated_data['category'] = self._resolve_category(validated_data, category_name)
         # Products created from the admin form are published by default.
         # Archiving remains the explicit way to hide a product from shoppers.
-        validated_data.setdefault('is_active', True)
-        validated_data.setdefault('is_archived', False)
+        validated_data['is_active'] = True
+        validated_data['is_archived'] = False
         name = validated_data.get('name', 'product')
         validated_data['slug'] = f'{slugify(name)}-{uuid4().hex[:8]}'
         product = Product.objects.create(**validated_data)

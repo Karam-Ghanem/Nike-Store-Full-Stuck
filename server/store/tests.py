@@ -154,12 +154,16 @@ class CommerceApiTests(APITestCase):
                 'price': '120.00',
                 'gender': 'unisex',
                 'category_name': 'Training',
+                'is_active': False,
                 'sizes_data': [{'size': '41', 'stock': 8}],
             },
             format='json',
         )
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         created_id = create_response.data['id']
+        created_product = Product.objects.get(id=created_id)
+        self.assertTrue(created_product.is_active)
+        self.assertFalse(created_product.is_archived)
         self.client.force_authenticate(user=None)
         public_response = self.client.get(reverse('product-list'))
         self.assertEqual(public_response.status_code, status.HTTP_200_OK)
