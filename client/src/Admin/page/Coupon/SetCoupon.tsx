@@ -3,10 +3,23 @@ import { Container, Table, Box, Flex, Text} from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import useCouponStore from "./couponStore";
 import AddCoupon from "./AddCoupon";
+import { useEffect } from "react";
 
 const SetCoupon = () => {
 
-    const {coupons,removeCoupon} = useCouponStore()
+    const {coupons, removeCoupon, loadCoupons} = useCouponStore()
+
+    useEffect(() => {
+      void loadCoupons();
+    }, [loadCoupons]);
+
+    const remove = async (couponId: string) => {
+      try {
+        await removeCoupon(couponId);
+      } catch {
+        // The current layout has no error surface; the item remains visible on failure.
+      }
+    };
 
   // 🎨 ألوان تتغير حسب الثيم
   const cardBg = useColorModeValue("white", "#1a1a1a");
@@ -76,7 +89,7 @@ const SetCoupon = () => {
                                 lg: "18px",
                               }}
                               onClick={() => {
-                                  removeCoupon(coupon.id)
+                                  void remove(coupon.id)
                               }}
                             >
                               X

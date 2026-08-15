@@ -180,20 +180,20 @@ const TextReviewForm = () => {
                 }
                 marginTop={4}
                 bg="#a353e9"
-                onClick={() => {
-                  AddReview(singleReview);
-                  setSingleReview({
-                    name: "",
-                    img: undefined,
-                    description: "",
-                  });
-                  setSelectedPersonalImage(undefined);
-                  setSelectedIDImage("");
-                  toaster.create({
-                    title: "One Comment Added ",
-                    type: "success",
-                    duration: 5000,
-                  });
+                onClick={async () => {
+                  try {
+                    await AddReview(singleReview);
+                    setSingleReview({ name: "", img: undefined, description: "" });
+                    setSelectedPersonalImage(undefined);
+                    setSelectedIDImage("");
+                    toaster.create({ title: "One Comment Added", type: "success", duration: 5000 });
+                  } catch (error) {
+                    toaster.create({
+                      title: error instanceof Error ? error.message : "Unable to add your review.",
+                      type: "error",
+                      duration: 5000,
+                    });
+                  }
                 }}
               >
                 Add My Comment

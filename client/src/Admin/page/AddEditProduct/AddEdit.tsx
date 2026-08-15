@@ -16,6 +16,7 @@ import {
 import { Toaster, toaster } from "@/components/ui/toaster";
 import { v4 as uuidv4 } from "uuid";
 import type { ChangeEvent } from "react";
+import { useState } from "react";
 import useProductAdmin from "@/Admin/Hooks/useProductAdmin";
 
 interface Props {
@@ -34,6 +35,7 @@ const AddProduct = ({ title }: Props) => {
     setNewProduct,
     id,
   } = useProductAdmin();
+  const [imageFile, setImageFile] = useState<File | undefined>();
 
   return (
     <>
@@ -140,7 +142,8 @@ const AddProduct = ({ title }: Props) => {
                     if (!file) return;
 
                     const imageURL = URL.createObjectURL(file);
-                    setNewProduct({ ...newProduct, productImg: imageURL });
+                    setImageFile(file);
+                    setNewProduct({ ...newProduct, productImg: imageURL, imageFile: file });
                   }}
                 />
               </Field.Root>
@@ -378,36 +381,24 @@ const AddProduct = ({ title }: Props) => {
 
           {/* SUBMIT BUTTON ALWAYS LAST */}
           <Button
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault();
-              setNewProduct({
-                id: uuidv4(),
-                category: "Category",
-                gender: "Gender",
-                productDescription: "",
-                productPrice: "",
-                productName: "",
-                isDiscounted: false,
-                isArchived: false,
-                oldProductPrice: "",
-                sizesAndQuantities: [],
-                href: "product/",
-                productImg: undefined,
-              });
-              if (id) {
-                editProduct(id, newProduct);
-                toaster.create({
-                  title: "One Shoe Edited successfully!",
-                  type: "success",
-                  duration: 5000,
+              try {
+                if (id) {
+                  await editProduct(id, { ...newProduct, imageFile });
+                  toaster.create({ title: "One Shoe Edited successfully!", type: "success", duration: 5000 });
+                } else {
+                  await addProduct({ ...newProduct, imageFile });
+                  toaster.create({ title: "One Shoe Added successfully!", type: "success", duration: 5000 });
+                }
+                setNewProduct({
+                  id: uuidv4(), category: "Category", gender: "Gender", productDescription: "", productPrice: "",
+                  productName: "", isDiscounted: false, isArchived: false, oldProductPrice: "", sizesAndQuantities: [],
+                  href: "product/", productImg: undefined,
                 });
-              } else {
-                addProduct(newProduct);
-                toaster.create({
-                  title: "One Shoe Added successfully!",
-                  type: "success",
-                  duration: 5000,
-                });
+                setImageFile(undefined);
+              } catch (error) {
+                toaster.create({ title: error instanceof Error ? error.message : "Unable to save this product.", type: "error", duration: 5000 });
               }
             }}
             type="submit"

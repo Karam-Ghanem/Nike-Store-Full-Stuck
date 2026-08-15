@@ -1,201 +1,174 @@
 import { create } from "zustand";
+
+import { commerceApi, mapApiProduct, type ProductWritePayload } from "@/api/commerce";
+import { getAccessToken } from "@/api/client";
+import type { CatrtItem } from "@/Pages/Cart/cartStore";
+import type { Archive } from "@/Admin/page/archive/archiveList";
+
 import type { Product } from "./Products Data/productsList";
 import ProductsList from "./Products Data/productsList";
 import type { Query } from "./ProductControls";
-import  { type Archive } from "@/Admin/page/archive/archiveList";
-import type { CatrtItem } from "@/Pages/Cart/cartStore";
 
-
-interface ProductStore{
-  products:Product[],
-  Filteration: (query: Query) => void,
-  archivedProducts:Archive[],
-  Searching:(textSearch:string)=>void,
-  addProduct:(product:Product)=>void,
-  removeFromArchive:(productID:string)=>void;
-  archiveProduct:(product:Product)=>void,
-  editProduct:(productID:string,product:Product)=>void,
-  applyDiscount:(on:string,percent:number)=>void;
-  applyDiscountOnShoese:(productId:string,percent:number)=>void;
-  decreaseStock:(cartItem:CatrtItem[])=>void;
+interface ProductStore {
+  products: Product[];
+  allProducts: Product[];
+  isLoading: boolean;
+  loadProducts: () => Promise<void>;
+  Filteration: (query: Query) => void;
+  archivedProducts: Archive[];
+  Searching: (textSearch: string) => void;
+  addProduct: (product: Product) => Promise<void>;
+  removeFromArchive: (productID: string) => Promise<void>;
+  archiveProduct: (product: Product) => Promise<void>;
+  editProduct: (productID: string, product: Product) => Promise<void>;
+  applyDiscount: (on: string, percent: number) => Promise<void>;
+  applyDiscountOnShoese: (productID: string, percent: number) => Promise<void>;
+  decreaseStock: (cartItem: CatrtItem[]) => void;
   increaseStock: (returnedItem: CatrtItem) => void;
 }
 
+const toProductPayload = (product: Product): ProductWritePayload => ({
+  name: product.productName,
+  description: product.productDescription,
+  price: product.productPrice,
+  gender: product.gender,
+  categoryName: product.category,
+  sizes: product.sizesAndQuantities.map((size) => ({ size: size.Size, stock: size.quantity })),
+  imageFile: product.imageFile,
+});
 
-const useProductStore = create<ProductStore>(set=>({
-    products:ProductsList,
-    archivedProducts:[],
-    Filteration:(query)=>set(()=>({
-        products:
-        query.selectedCategory && query.selectedGender ?
-        ProductsList.filter(prod=>prod.category==query.selectedCategory && prod.gender==query.selectedGender)
-        :
-        query.selectedCategory ?
-         ProductsList.filter(prod=>prod.category===query.selectedCategory)
-        :
-        query.selectedGender? 
-        ProductsList.filter(prod=>prod.gender==query.selectedGender)
-        :
-        ProductsList
-    })),
-    Searching:(searchText)=>set(()=>({
-        products:
-        searchText !=="" ?
-        isNaN(parseFloat(searchText)) ?
-        ProductsList.filter((product)=>product.productName.includes(`${searchText[0].toUpperCase()}${searchText.slice(1)}`))
-        :
-        ProductsList.filter(product=>product.productPrice===`${searchText}$`)
-        :
-        ProductsList
-    })),
-    addProduct:(product)=>set((store)=>({
-      products:[...store.products,product]
-    })),
-    archiveProduct:(produc)=>set((store)=>(
-        
-        {
-        products:store.products.map(p=>p.id===produc.id ? {...p,isArchived:true} : p),
-        archivedProducts:[...store.archivedProducts,{product:{...produc},date:new Date()}]
-        }
-    )),
-    removeFromArchive:(productID)=>set((store)=>({
-    archivedProducts:[...store.archivedProducts.filter(arpr=>arpr.product.id!==productID)],
-    products:store.products.map(p=>p.id===productID ? {...p,isArchived:false} : p),
-    })),
-    editProduct:(productID,product)=>set((store)=>({
-        products:
-        store.products.map((prod)=>prod.id==productID ?
-         {
-            productName:product.productName,
-            category:product.category,
-            gender:product.gender,
-            href:product.href,
-            id:product.id,
-            productDescription:product.productDescription,
-            productImg:product.productImg,
-            productPrice:product.productPrice,
-            oldProductPrice:product.oldProductPrice,
-            isDiscounted:product.isDiscounted,
-            isArchived:product.isArchived,
-            sizesAndQuantities:product.sizesAndQuantities.map(s=>s)
-        }
-         :
-          prod)
-    })),
-    applyDiscount:(on,percent)=>set((store)=>(
-        on!='All' ? 
-        {
-        products:
-        store.products.map(product=>(product.category==on || product.gender==on) ? {
-        ...product,
-        isDiscounted:true,
-        oldProductPrice:product.productPrice,
-        productPrice: (
-          parseFloat(product.productPrice) -
-          (percent * parseFloat(product.productPrice) / 100)
-        )
-        .toString()+'$'
-        }
-    : { ...product } )
-         }
-        :
-        {
-          products:store.products.map(product=>({...product,oldProductPrice:product.productPrice,isDiscounted:true,productPrice:(
-          parseFloat(product.productPrice) -
-          (percent * parseFloat(product.productPrice) / 100)
-        )
-        .toString()+' $'}))
-        }
-        )
-    ),
-    applyDiscountOnShoese:(productID,percent)=>set((store)=>(        {
-        products:
-        store.products.map(product=>(product.id===productID) ? {
-        ...product,
-        isDiscounted:true,
-        oldProductPrice:product.productPrice,
-        productPrice: (
-          parseFloat(product.productPrice) -
-          (percent * parseFloat(product.productPrice) / 100)
-        )
-        .toString()+'$'
-        }
-    : { ...product } )
-    })),
-    decreaseStock: (cartItems) =>
-    set((store) => {
-    // 1) تحويل cartItems إلى بيانات واضحة
-    const purchased = cartItems.map(ci => {
-      const [productId, size] = ci.currentShoeseID.split("-");
-      return {
-        productId,
-        size,
-        quantity: ci.currentShoseQuantity
-      };
-    });
+const filterProducts = (products: Product[], query: Query) => {
+  if (query.selectedCategory && query.selectedGender) {
+    return products.filter((prod) => prod.category === query.selectedCategory && prod.gender === query.selectedGender);
+  }
+  if (query.selectedCategory) return products.filter((prod) => prod.category === query.selectedCategory);
+  if (query.selectedGender) return products.filter((prod) => prod.gender === query.selectedGender);
+  return products;
+};
 
-    // 2) تعديل المنتجات
-    const updatedProducts = store.products.map(prod =>{
-      // كل عمليات الشراء لهذا المنتج
-      const purchasesForThisProduct = purchased.filter(
-        p => p.productId === prod.id
-      );
+const useProductStore = create<ProductStore>((set, get) => ({
+  products: ProductsList,
+  allProducts: ProductsList,
+  archivedProducts: [],
+  isLoading: false,
 
-      if (purchasesForThisProduct.length === 0)
-        return prod; // المنتج لم يُشترى
+  loadProducts: async () => {
+    set({ isLoading: true });
+    try {
+      const apiProducts = await commerceApi.getProducts();
+      const products = apiProducts.map(mapApiProduct);
+      const archivedProducts = products.filter((product) => product.isArchived).map((product) => ({ product, date: new Date() }));
+      set({ products, allProducts: products, archivedProducts });
+    } catch {
+      // Static project data remains a visual fallback while the backend is unavailable.
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
-      // تعديل المقاسات
-      const updatedSizes = prod.sizesAndQuantities.map(sizeObj => {
-        // هل تم شراء هذا المقاس؟
-        const purchase = purchasesForThisProduct.find(
-          p => p.size === sizeObj.Size
-        );
+  Filteration: (query) => set((state) => ({ products: filterProducts(state.allProducts, query) })),
 
-        if (!purchase)
-          return sizeObj; // هذا المقاس لم يُشترى
-
-        return {
-          ...sizeObj,
-          quantity: sizeObj.quantity - purchase.quantity
-        };
-      });
-
-      return {
-        ...prod,
-        sizesAndQuantities: updatedSizes
-      };
-    });
-
-    return { products: updatedProducts };
+  Searching: (searchText) => set((state) => {
+    const text = searchText.trim();
+    if (!text) return { products: state.allProducts };
+    const normalized = text.toLowerCase();
+    return {
+      products: state.allProducts.filter((product) =>
+        product.productName.toLowerCase().includes(normalized)
+        || product.productPrice.replace('$', '') === text,
+      ),
+    };
   }),
-  increaseStock: (returnedItem) =>
-    set((store) => {
-      // استخراج productId و size من currentShoeseID
-      const [productId, size] = returnedItem.currentShoeseID.split("-");
 
-      // الكمية المُعادة
-      const quantity = returnedItem.currentShoseQuantity;
+  addProduct: async (product) => {
+    const created = getAccessToken() ? mapApiProduct(await commerceApi.createProduct(toProductPayload(product))) : product;
+    set((state) => ({
+      products: [...state.products, created],
+      allProducts: [...state.allProducts, created],
+    }));
+  },
 
-      const updatedProducts = store.products.map((prod) => {
-        if (prod.id !== productId) return prod;
+  archiveProduct: async (product) => {
+    if (getAccessToken()) await commerceApi.archiveProduct(Number(product.id));
+    set((state) => ({
+      products: state.products.map((item) => item.id === product.id ? { ...item, isArchived: true } : item),
+      allProducts: state.allProducts.map((item) => item.id === product.id ? { ...item, isArchived: true } : item),
+      archivedProducts: [...state.archivedProducts, { product: { ...product }, date: new Date() }],
+    }));
+  },
 
-        const updatedSizes = prod.sizesAndQuantities.map((sizeObj) => {
-          if (sizeObj.Size !== size) return sizeObj;
+  removeFromArchive: async (productID) => {
+    if (getAccessToken()) await commerceApi.unarchiveProduct(Number(productID));
+    set((state) => ({
+      archivedProducts: state.archivedProducts.filter((archived) => archived.product.id !== productID),
+      products: state.products.map((product) => product.id === productID ? { ...product, isArchived: false } : product),
+      allProducts: state.allProducts.map((product) => product.id === productID ? { ...product, isArchived: false } : product),
+    }));
+  },
 
-          return {
-            ...sizeObj,
-            quantity: sizeObj.quantity + quantity, // زيادة الكمية
-          };
-        });
+  editProduct: async (productID, product) => {
+    const updated = getAccessToken() ? mapApiProduct(await commerceApi.updateProduct(Number(productID), toProductPayload(product))) : product;
+    set((state) => {
+      const replace = (item: Product) => item.id === productID ? { ...updated } : item;
+      return { products: state.products.map(replace), allProducts: state.allProducts.map(replace) };
+    });
+  },
 
-        return {
-          ...prod,
-          sizesAndQuantities: updatedSizes,
-        };
-      });
+  applyDiscount: async (on, percent) => {
+    if (getAccessToken()) await commerceApi.setBulkDiscount(on, percent);
+    set((state) => {
+    const applies = (product: Product) => on === 'All' || product.category === on || product.gender === on;
+    const update = (product: Product) => !applies(product) ? product : {
+      ...product,
+      isDiscounted: true,
+      oldProductPrice: product.productPrice,
+      productPrice: `${(parseFloat(product.productPrice) * (1 - percent / 100)).toFixed(2)}$`,
+    };
+    return { products: state.products.map(update), allProducts: state.allProducts.map(update) };
+    });
+  },
 
-      return { products: updatedProducts };
-    }),
- }))
+  applyDiscountOnShoese: async (productID, percent) => {
+    const product = get().allProducts.find((item) => item.id === productID);
+    if (getAccessToken() && product) {
+      await commerceApi.setProductDiscount(Number(productID), percent);
+    }
+    set((state) => {
+    const update = (product: Product) => product.id !== productID ? product : {
+      ...product,
+      isDiscounted: true,
+      oldProductPrice: product.productPrice,
+      productPrice: `${(parseFloat(product.productPrice) * (1 - percent / 100)).toFixed(2)}$`,
+    };
+    return { products: state.products.map(update), allProducts: state.allProducts.map(update) };
+    });
+  },
+
+  decreaseStock: (cartItems) => set((state) => {
+    const update = (product: Product) => {
+      const purchases = cartItems.filter((item) => item.product.id === product.id);
+      if (!purchases.length) return product;
+      return {
+        ...product,
+        sizesAndQuantities: product.sizesAndQuantities.map((size) => {
+          const purchase = purchases.find((item) => item.currentShoseSize === size.Size);
+          return purchase ? { ...size, quantity: size.quantity - purchase.currentShoseQuantity } : size;
+        }),
+      };
+    };
+    return { products: state.products.map(update), allProducts: state.allProducts.map(update) };
+  }),
+
+  increaseStock: (returnedItem) => set((state) => {
+    const update = (product: Product) => product.id !== returnedItem.product.id ? product : {
+      ...product,
+      sizesAndQuantities: product.sizesAndQuantities.map((size) => size.Size !== returnedItem.currentShoseSize ? size : {
+        ...size,
+        quantity: size.quantity + returnedItem.currentShoseQuantity,
+      }),
+    };
+    return { products: state.products.map(update), allProducts: state.allProducts.map(update) };
+  }),
+}));
 
 export default useProductStore;

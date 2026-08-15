@@ -13,6 +13,7 @@ import AdminApp from "@/Admin/AdminApp";
 import NotFound from "@/Admin/page/notFound/NotFound";
 import Wallet from "@/Pages/CheckOut/Wallet";
 import MyPurchases from "@/Pages/purchases/MyPurchases";
+import AuthPage from "@/Pages/Auth/AuthPage";
 
 import { createBrowserRouter } from "react-router-dom";
 const router = createBrowserRouter([
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: "checkout/pay", element: <Pay />},
       { path: "checkout/pay/wallet/:type", element: <Wallet />},
       { path: "mypurchases", element: <MyPurchases />},
+      { path: "auth", element: <AuthPage />},
     ],
   },
   {

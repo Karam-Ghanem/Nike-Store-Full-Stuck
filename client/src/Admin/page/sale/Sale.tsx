@@ -166,20 +166,19 @@ const Sale = () => {
                     md: "16px",
                     lg: "18px",
                   }}
-                  onClick={() => {
-                    if (id) {
-                      applyDiscountOnShoese(id, selectedPercentage);
-                    } else {
-                      applyDiscount(selectedType, selectedPercentage);
-                      setSelectedType("");
+                  onClick={async () => {
+                    try {
+                      if (id) {
+                        await applyDiscountOnShoese(id, selectedPercentage);
+                      } else {
+                        await applyDiscount(selectedType, selectedPercentage);
+                        setSelectedType("");
+                      }
+                      setSelectedPercentage(0);
+                      toaster.create({ title: `A ${selectedPercentage}% discount has been applied.`, type: "success", duration: 5000 });
+                    } catch (error) {
+                      toaster.create({ title: error instanceof Error ? error.message : "Unable to apply discount.", type: "error", duration: 5000 });
                     }
-                    setSelectedPercentage(0);
-
-                    toaster.create({
-                      title: `A ${selectedPercentage}% discount has been applied.`,
-                      type: "success",
-                      duration: 5000,
-                    });
                   }}
                 >
                   Ok

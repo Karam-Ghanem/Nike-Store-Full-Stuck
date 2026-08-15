@@ -12,9 +12,27 @@ import { Link } from "react-router-dom";
 import useFavoriteStore from "./FavoritesStore";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import PurchaseProcess from "@/components/Products/PurchaseProcess";
+import { useEffect } from "react";
 
 const Favorites = () => {
-  const { deleteProductFromFav, favoritesItems } = useFavoriteStore();
+  const { deleteProductFromFav, favoritesItems, loadFavorites } = useFavoriteStore();
+
+  useEffect(() => {
+    void loadFavorites();
+  }, [loadFavorites]);
+
+  const removeFavorite = async (productId: string) => {
+    try {
+      await deleteProductFromFav(productId);
+      toaster.create({ title: "Item Deleted From your Favorites successfully!", type: "success", duration: 5000 });
+    } catch (error) {
+      toaster.create({
+        title: error instanceof Error ? error.message : "Unable to remove this product.",
+        type: "error",
+        duration: 4500,
+      });
+    }
+  };
 
   if (favoritesItems.length < 1) {
     return (
@@ -181,15 +199,7 @@ const Favorites = () => {
                             md: "16px",
                             lg: "20px",
                           }}
-                          onClick={() => {
-                            deleteProductFromFav(product.id);
-                            toaster.create({
-                              title:
-                                "Item Deleted From your Favorites successfully!",
-                              type: "success",
-                              duration: 5000,
-                            });
-                          }}
+                          onClick={() => void removeFavorite(product.id)}
                         >
                           X
                         </Text>

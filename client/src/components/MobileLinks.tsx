@@ -2,12 +2,22 @@ import { Box } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
 import { Button, Menu, Portal, Text } from "@chakra-ui/react";
 import Links from "./Header/links";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ColorModeToggle from "./ColorModeToggle";
+import useAuthStore from "@/auth/authStore";
 
 
 
 const MobileLinks = () => {
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+
+  const signOut = async () => {
+    await logout();
+    navigate('/');
+  };
+
   return (
     <>
       <Box className="md:hidden">
@@ -86,24 +96,34 @@ const MobileLinks = () => {
                   </Link>
                 </Menu.Item>
 
-                <Menu.Item
-                  borderBottom="1px solid #fcfc"
-                  fontSize={10}
-                  value="new-txt"
-                  color="#c571cd"
-                  bg="transparent"
-                  fontWeight={600}
-                  _hover={{
-                    color: "#4d06a3",
-                    cursor: "pointer",
-                    marginLeft: "30px",
-                  }}
-                  transition="0.5s"
-                >
-                  <Link to={""}>
-                    <Text padding={3}>Profile</Text>
-                  </Link>
-                </Menu.Item>
+                {user ? (
+                  <Menu.Item
+                    borderBottom="1px solid #fcfc"
+                    fontSize={10}
+                    value="logout"
+                    color="#c571cd"
+                    bg="transparent"
+                    fontWeight={600}
+                    _hover={{ color: "#4d06a3", cursor: "pointer", marginLeft: "30px" }}
+                    transition="0.5s"
+                    onClick={() => void signOut()}
+                  >
+                    <Text padding={3}>Log Out</Text>
+                  </Menu.Item>
+                ) : (
+                  <Menu.Item
+                    borderBottom="1px solid #fcfc"
+                    fontSize={10}
+                    value="auth"
+                    color="#c571cd"
+                    bg="transparent"
+                    fontWeight={600}
+                    _hover={{ color: "#4d06a3", cursor: "pointer", marginLeft: "30px" }}
+                    transition="0.5s"
+                  >
+                    <Link to="/auth"><Text padding={3}>Log In</Text></Link>
+                  </Menu.Item>
+                )}
                 <Menu.Item
                   fontSize={10}
                   value="new-txt"

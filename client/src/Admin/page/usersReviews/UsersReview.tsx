@@ -2,6 +2,8 @@ import MainTitle from "@/components/PublicCompontents/MainTitle";
 import useReviewStore from "@/Pages/Review/reviewStore";
 import {
   Box,
+  Button,
+  Card,
   Text,
   SimpleGrid,
   Badge,
@@ -10,16 +12,44 @@ import {
 } from "@chakra-ui/react";
 
 import type { CheckBoxItem, RadioItem } from "@/Pages/Review/Data/Qustions";
+import { useEffect } from "react";
+import { Toaster, toaster } from "@/components/ui/toaster";
 
 const UsersReview = () => {
-  const { checkEvalutes, radioEvalutes } = useReviewStore();
+  const { checkEvalutes, radioEvalutes, reviews, loadReviews, removeReview } = useReviewStore();
+
+  useEffect(() => {
+    void loadReviews();
+  }, [loadReviews]);
+
+  const deleteReview = async (reviewId: number) => {
+    try {
+      await removeReview(reviewId);
+      toaster.create({ title: 'Review deleted successfully.', type: 'success', duration: 3500 });
+    } catch (error) {
+      toaster.create({ title: error instanceof Error ? error.message : 'Unable to delete review.', type: 'error', duration: 4500 });
+    }
+  };
 
   return (
     <>
+      <Toaster />
       <MainTitle
         title="USERS REVIEWS"
       />
 
+      <Text color="#7008e7" fontWeight="bold" fontSize={{ base: '18px', md: '24px' }} marginTop={6} marginBottom={4}>Published Reviews</Text>
+      <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} gap={5} padding={{ base: 3, sm: 4, md: 5 }}>
+        {reviews.map((review) => (
+          <Card.Root key={review.id || `${review.name}-${review.description}`} border="1px solid #e5d1f5" padding={4}>
+            <Card.Title color="#7008e7">{review.name}</Card.Title>
+            <Card.Description marginTop={2}>{review.description}</Card.Description>
+            {review.id && <Button size="sm" colorPalette="red" alignSelf="flex-end" marginTop={3} onClick={() => void deleteReview(review.id!)}>Delete</Button>}
+          </Card.Root>
+        ))}
+      </SimpleGrid>
+
+      <Text color="#7008e7" fontWeight="bold" fontSize={{ base: '18px', md: '24px' }} marginTop={8} marginBottom={2}>Survey Responses</Text>
       <SimpleGrid
         columns={{ base: 1, sm: 1, md: 2, lg: 2 }}
         gap={{ base: 4, sm: 6, md: 8, lg: 10 }}

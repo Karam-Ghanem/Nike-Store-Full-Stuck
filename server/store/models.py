@@ -1,8 +1,8 @@
 from datetime import timedelta
 from decimal import Decimal
-from decimal import Decimal
 
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -55,7 +55,72 @@ class ProductSize(models.Model):
         return f'{self.product.name} - {self.size}'
 
 
-# Coupon model removed — feature disabled
+class Coupon(models.Model):
+    DISCOUNT_PERCENT = 'percent'
+    DISCOUNT_FIXED = 'fixed'
+    DISCOUNT_CHOICES = [
+        (DISCOUNT_PERCENT, 'Percentage'),
+        (DISCOUNT_FIXED, 'Fixed amount'),
+    ]
+
+    code = models.CharField(max_length=50, unique=True)
+    discount_type = models.CharField(max_length=10, choices=DISCOUNT_CHOICES, default=DISCOUNT_PERCENT)
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('50.00'),
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
+    min_order_total = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    active = models.BooleanField(default=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.code
+
+    def is_valid_for(self, subtotal, today=None):
+        today = today or timezone.localdate()
+        if not self.active or subtotal < self.min_order_total:
+            return False
+        if self.start_date and self.start_date > today:
+            return False
+        if self.end_date and self.end_date < today:
+            return False
+        return True
+
+    def calculate_discount(self, subtotal):
+        subtotal = Decimal(subtotal)
+        if self.discount_type == self.DISCOUNT_PERCENT:
+            discount = subtotal * self.amount / Decimal('100')
+        else:
+            discount = self.amount
+        return min(discount, subtotal).quantize(Decimal('0.01'))
+
+
+class ReturnPolicy(models.Model):
+    return_period_days = models.PositiveIntegerField(
+        default=7,
+        validators=[MinValueValidator(1), MaxValueValidator(365)],
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Return policy'
+        verbose_name_plural = 'Return policy'
+
+    @classmethod
+    def current(cls):
+        policy, _ = cls.objects.get_or_create(pk=1, defaults={'return_period_days': 7})
+        return policy
+
+    def __str__(self):
+        return f'{self.return_period_days} day return policy'
 
 
 class Favorite(models.Model):
@@ -85,14 +150,16 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_COMPLETED = 'completed'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_RETURNED = 'returned'
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-        ('returned', 'Returned'),
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_COMPLETED, 'Completed'),
+        (STATUS_CANCELLED, 'Cancelled'),
+        (STATUS_RETURNED, 'Returned'),
     ]
-
-    RETURN_PERIOD_DAYS = 7
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='orders', on_delete=models.CASCADE)
     full_name = models.CharField(max_length=200)
@@ -101,8 +168,11 @@ class Order(models.Model):
     message = models.TextField(blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    # coupon field removed
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    coupon = models.ForeignKey(Coupon, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     return_requested = models.BooleanField(default=False)
@@ -115,7 +185,8 @@ class Order(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new and self.return_deadline is None:
-            self.return_deadline = self.created_at + timedelta(days=self.RETURN_PERIOD_DAYS)
+            policy = ReturnPolicy.current()
+            self.return_deadline = self.created_at + timedelta(days=policy.return_period_days)
             super().save(update_fields=['return_deadline'])
 
 
@@ -130,12 +201,37 @@ class OrderItem(models.Model):
         return f'{self.quantity} x {self.product.name} ({self.product_size.size})'
 
 
+class ReturnRequest(models.Model):
+    STATUS_REQUESTED = 'requested'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CHOICES = [
+        (STATUS_REQUESTED, 'Requested'),
+        (STATUS_APPROVED, 'Approved'),
+        (STATUS_REJECTED, 'Rejected'),
+    ]
+
+    order_item = models.OneToOneField(OrderItem, related_name='return_request', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='return_requests', on_delete=models.CASCADE)
+    reason = models.TextField(blank=True)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_REQUESTED)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Return request for order item {self.order_item_id}'
+
+
 class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reviews', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField()
+    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.SET_NULL, null=True, blank=True)
+    rating = models.PositiveSmallIntegerField(default=5)
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Review {self.rating} by {self.user.username} for {self.product.name}'
+        product_name = self.product.name if self.product_id else 'store'
+        return f'Review {self.rating} by {self.user.username} for {product_name}'

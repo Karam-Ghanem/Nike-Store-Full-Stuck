@@ -1,26 +1,38 @@
-import { create } from 'zustand'
-import CouponList from './CouponList'
+import { create } from 'zustand';
+
+import { commerceApi } from '@/api/commerce';
 
 export interface CouponList {
-    id: string,
-    coupon: string,
+  id: string;
+  coupon: string;
 }
 
-
- interface couponStore {
-    coupons: CouponList[],
-    addCoupon:(coupon:string)=>void,
-    removeCoupon:(couponID:string)=>void,
+interface CouponStore {
+  coupons: CouponList[];
+  loadCoupons: () => Promise<void>;
+  addCoupon: (coupon: string) => Promise<void>;
+  removeCoupon: (couponID: string) => Promise<void>;
 }
-const useCouponStore = create<couponStore>(set => ({
-    coupons:CouponList,
-    addCoupon:(coupon)=>set((store)=>({
-        coupons:[...store.coupons,{coupon:coupon,id:coupon}]
-    })),
-    removeCoupon:(couponID)=>set((store)=>({
-        coupons:store.coupons.filter(coupon=>coupon.id!==couponID)
-    })),
 
-    
-}))
+const useCouponStore = create<CouponStore>((set) => ({
+  coupons: [],
+
+  loadCoupons: async () => {
+    const coupons = await commerceApi.getCoupons();
+    set({ coupons: coupons.map((coupon) => ({ id: String(coupon.id), coupon: coupon.code })) });
+  },
+
+  addCoupon: async (coupon) => {
+    const created = await commerceApi.createCoupon(coupon.trim());
+    set((state) => ({
+      coupons: [...state.coupons, { id: String(created.id), coupon: created.code }],
+    }));
+  },
+
+  removeCoupon: async (couponID) => {
+    await commerceApi.deleteCoupon(Number(couponID));
+    set((state) => ({ coupons: state.coupons.filter((coupon) => coupon.id !== couponID) }));
+  },
+}));
+
 export default useCouponStore;

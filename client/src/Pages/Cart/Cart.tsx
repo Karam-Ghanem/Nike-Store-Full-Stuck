@@ -7,9 +7,14 @@ import useCartStore from "@/Pages/Cart/cartStore";
 import { Toaster } from "@/components/ui/toaster";
 import CartTable from "./CartTable";
 import CartTotalAndCoupon from "./CartTotalAndCoupon";
+import { useEffect } from "react";
 
 const Cart = () => {
-  const { cartItems } =useCartStore();
+  const { cartItems, loadCart } =useCartStore();
+
+  useEffect(() => {
+    void loadCart();
+  }, [loadCart]);
 
 
   if (cartItems.length < 1) {

@@ -10,7 +10,8 @@ import shoese8 from "@/assets/shoese/_8.jpeg";
 
 export interface SizeAndQuantity{
     Size:string;
-    quantity:number;    
+    quantity:number;
+    apiSizeId?: number;
 }
 export interface Product{
     id: string;
@@ -25,6 +26,8 @@ export interface Product{
     href: string; 
     gender:string;
     sizesAndQuantities:SizeAndQuantity[];
+    favoriteId?: number;
+    imageFile?: File;
 }
 
 const ProductsList =[

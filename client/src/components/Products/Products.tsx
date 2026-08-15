@@ -3,7 +3,7 @@ import MainTitle from "../PublicCompontents/MainTitle";
 import { SimpleGrid } from "@chakra-ui/react";
 import { Card, Image } from "@chakra-ui/react";
 import { FaHeart } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import ProductControls from "./ProductControls";
 import useProduct from "@/components/Products/Hooks/useProduct";
@@ -13,11 +13,23 @@ import EditAndArchiveAdmin from "./EditAndArchiveAdmin";
 import ShowAllProductsButton from "./ShowAllProductsButton";
 import PagenantionButtons from "./PagenantionButtons";
 import SoldDesign from "./SoldDesign";
+import { useEffect } from "react";
+import useProductStore from "./ProductStore";
+import useAuthStore from "@/auth/authStore";
 interface Props {
   homePage: boolean;
   edit_delete:boolean;
 }
 const Products = ({ homePage,edit_delete }: Props) => {
+  const loadProducts = useProductStore((state) => state.loadProducts);
+  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    void loadProducts();
+  }, [loadProducts]);
+
+
 
   const {
     actualProductList,
@@ -36,9 +48,33 @@ const Products = ({ homePage,edit_delete }: Props) => {
     setFavItems,
   } = useProduct(false);
 
-
-
-
+  const toggleFavorite = async (item: typeof products[number]) => {
+    if (!user) {
+      toaster.create({ title: "Please log in before saving favorites.", type: "info", duration: 3500 });
+      navigate('/auth');
+      return;
+    }
+    try {
+      if (!favItems.includes(item.id)) {
+        await addProductToFavList(item);
+        setFavItems([...favItems, item.id]);
+      } else {
+        await deleteProductFromFav(item.id);
+        setFavItems(favItems.filter((id) => id !== item.id));
+      }
+      toaster.create({
+        title: `Item ${favItems.includes(item.id) ? "deleted from" : "added to"} your Favourite successfully!`,
+        type: "success",
+        duration: 5000,
+      });
+    } catch (error) {
+      toaster.create({
+        title: error instanceof Error ? error.message : "Unable to update your favorites.",
+        type: "error",
+        duration: 4500,
+      });
+    }
+  };
 
   return (
     <>
@@ -155,27 +191,7 @@ const Products = ({ homePage,edit_delete }: Props) => {
                         <FaHeart
                           size={24}
                           color="#7008e7"
-                          onClick={() => {
-                            if (!favItems.includes(item.id)) {
-                              addProductToFavList(item);
-                              setFavItems([...favItems, item.id]);
-                            } else {
-                              deleteProductFromFav(item.id);
-                              const newFavItem = favItems.filter(
-                                (i) => i != item.id
-                              );
-                              setFavItems(newFavItem);
-                            }
-                            toaster.create({
-                              title: `Item ${
-                                favItems.includes(item.id)
-                                  ? "deleted from"
-                                  : "added to"
-                              }  your Favourite successfully!`,
-                              type: "success",
-                              duration: 5000,
-                            });
-                          }}
+                          onClick={() => void toggleFavorite(item)}
                         />
                       </IconButton>
                     </Box>

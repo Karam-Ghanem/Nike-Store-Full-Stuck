@@ -1,81 +1,192 @@
- import { create } from 'zustand'
+import { create } from 'zustand';
+
+import { commerceApi, mapApiProduct, type ApiCartItem, type ApiOrder } from '@/api/commerce';
+import { getAccessToken } from '@/api/client';
 import type { Product } from '@/components/Products/Products Data/productsList';
 
-
-
-export interface CatrtItem{
-    product:Product;
-    currentShoseSize:string;
-    currentShoseQuantity:number;
-    currentShoeseID:string;
+export interface CatrtItem {
+  product: Product;
+  currentShoseSize: string;
+  currentShoseQuantity: number;
+  currentShoeseID: string;
+  cartItemId?: number;
+  orderItemId?: number;
+  orderId?: number;
+  orderedAt?: string;
+  returnStatus?: 'requested' | 'approved' | 'rejected' | null;
 }
 
-interface cartStore{
-    cartItems:CatrtItem [];
-    myPurchases:CatrtItem[];
-    purchaseDate:Date ;
-    currentShoeseQuantity:number;
-    isDiscounted:boolean;
-    setIsDiscounted:(isDiscounted:boolean)=>void
-    addProductToCart:(product:Product,currentShoseSize:string,currentShoeseQuantity:number,currentShoeseID:string)=>void;
-    setCurrentChoseQuantity:(currentShoeseID:string,currentShoeseQuantity:number)=>void;
-    deleteProductFromCart:(currentShoeseID:string)=>void;
-    getTotalPrice:(cartItems:CatrtItem[])=>number;
-    addProductsToMyPurchases:(myPurchases:CatrtItem[],purchaseDate:Date)=>void;
-    returnProduct:(productID:string | Product)=>void;
-    editProductPriceAfterUseCoupon:()=>void;
+interface CartStore {
+  cartItems: CatrtItem[];
+  myPurchases: CatrtItem[];
+  purchaseDate: Date;
+  currentShoeseQuantity: number;
+  isDiscounted: boolean;
+  couponCode: string | null;
+  couponDiscountAmount: number;
+  setIsDiscounted: (isDiscounted: boolean) => void;
+  setCoupon: (couponCode: string, discountAmount: number) => void;
+  clearCoupon: () => void;
+  loadCart: () => Promise<void>;
+  loadPurchases: () => Promise<void>;
+  addProductToCart: (product: Product, currentShoseSize: string, currentShoeseQuantity: number, currentShoeseID: string) => Promise<void>;
+  setCurrentChoseQuantity: (currentShoeseID: string, currentShoeseQuantity: number) => Promise<void>;
+  deleteProductFromCart: (currentShoeseID: string) => Promise<void>;
+  getTotalPrice: (cartItems: CatrtItem[]) => number;
+  getFinalPrice: () => number;
+  addProductsToMyPurchases: (myPurchases: CatrtItem[], purchaseDate: Date) => void;
+  clearCartAfterOrder: () => void;
+  returnProduct: (productID: string | Product) => Promise<void>;
+  editProductPriceAfterUseCoupon: () => void;
 }
-const useCartStore =create<cartStore>(set=>({
-    cartItems:[],
-    myPurchases:[],
-    purchaseDate:new Date(),
-    currentShoeseQuantity:0,
-    isDiscounted:false,
-    setIsDiscounted:(isDiscounted)=>set(()=>({
-        isDiscounted:isDiscounted
-    })),
-    addProductToCart:(product,currentShoeseSize,currentShoeseQuantity,currentShoeseID)=>set((store)=>({
-        cartItems:[...store.cartItems,{product: product,currentShoseSize: currentShoeseSize,currentShoseQuantity:currentShoeseQuantity,currentShoeseID:currentShoeseID}]
-    })),
-    setCurrentChoseQuantity:(currentShoeseID,currentShoeseQuantity)=>set((store)=>({
-       cartItems:[...store.cartItems.map((product)=>{if(product.currentShoeseID===currentShoeseID)product.currentShoseQuantity=currentShoeseQuantity; return product})]
 
-    })),
-    deleteProductFromCart:(currentShoeseID)=>set((store)=>({
-        cartItems:store.cartItems.filter((prod)=>prod.currentShoeseID!=currentShoeseID)
-    })),
-    getTotalPrice:(cartItems)=>{
-    const totalPrice =cartItems.reduce(
-    (acc, item) =>
-    acc + item.currentShoseQuantity! * parseFloat(item.product.productPrice),
-    0
-    )
-    return totalPrice;
-    },
-    addProductsToMyPurchases:(myPurchases,purchaseDate)=>set(()=>({
-        myPurchases:[...myPurchases],
-        purchaseDate:purchaseDate,
-        cartItems:[],
+function cartItemFromApi(item: ApiCartItem): CatrtItem {
+  const product = mapApiProduct(item.product);
+  return {
+    product,
+    currentShoseSize: item.product_size.size,
+    currentShoseQuantity: item.quantity,
+    currentShoeseID: `${product.id}-${item.product_size.size}`,
+    cartItemId: item.id,
+  };
+}
 
-        
-    })),
-    returnProduct:(productID)=>set((store)=>({
-        myPurchases:store.myPurchases.filter((prod)=>prod.currentShoeseID!=productID),
-        cartItems:store.cartItems.filter((prod)=>prod.currentShoeseID!=productID)
-    })),
-    editProductPriceAfterUseCoupon:()=>set((store)=>({
-        cartItems:store.cartItems.map((cartItem)=>{
-            const discountedPrice = parseFloat(cartItem.product.productPrice) / 2;
-            return {
-                ...cartItem,
-                product: {
-                    ...cartItem.product,
-                    productPrice: `${discountedPrice}$`,
-                },
-            };
-        })
-    })),
+function purchaseItemsFromOrder(order: ApiOrder): CatrtItem[] {
+  return order.items.map((item) => {
+    const product = mapApiProduct(item.product);
+    return {
+      product,
+      currentShoseSize: item.product_size.size,
+      currentShoseQuantity: item.quantity,
+      currentShoeseID: `${product.id}-${item.product_size.size}`,
+      orderItemId: item.id,
+      orderId: order.id,
+      orderedAt: order.created_at,
+      returnStatus: item.return_request_status,
+    };
+  });
+}
 
+const useCartStore = create<CartStore>((set, get) => ({
+  cartItems: [],
+  myPurchases: [],
+  purchaseDate: new Date(),
+  currentShoeseQuantity: 0,
+  isDiscounted: false,
+  couponCode: null,
+  couponDiscountAmount: 0,
 
-}))
+  setIsDiscounted: (isDiscounted) => set({ isDiscounted }),
+  setCoupon: (couponCode, couponDiscountAmount) => set({
+    couponCode,
+    couponDiscountAmount,
+    isDiscounted: true,
+  }),
+  clearCoupon: () => set({ couponCode: null, couponDiscountAmount: 0, isDiscounted: false }),
+
+  loadCart: async () => {
+    if (!getAccessToken()) return;
+    const items = await commerceApi.getCart();
+    set({ cartItems: items.map(cartItemFromApi) });
+  },
+
+  loadPurchases: async () => {
+    if (!getAccessToken()) return;
+    const orders = await commerceApi.getOrders();
+    const purchases = orders.flatMap(purchaseItemsFromOrder);
+    set({
+      myPurchases: purchases,
+      purchaseDate: orders.length ? new Date(orders[0].created_at) : new Date(),
+    });
+  },
+
+  addProductToCart: async (product, currentShoseSize, currentShoseQuantity, currentShoeseID) => {
+    const existing = get().cartItems.find((item) => item.currentShoeseID === currentShoeseID);
+    const selectedSize = product.sizesAndQuantities.find((size) => size.Size === currentShoseSize);
+    if (!selectedSize?.apiSizeId || !getAccessToken()) {
+      if (!existing) {
+        set((state) => ({
+          cartItems: [...state.cartItems, { product, currentShoseSize, currentShoseQuantity, currentShoeseID }],
+        }));
+      }
+      return;
+    }
+    if (existing?.cartItemId) {
+      const response = await commerceApi.updateCartItem(existing.cartItemId, existing.currentShoseQuantity + currentShoseQuantity);
+      const updated = cartItemFromApi(response);
+      set((state) => ({ cartItems: state.cartItems.map((item) => item.cartItemId === updated.cartItemId ? updated : item) }));
+      return;
+    }
+    const response = await commerceApi.addCartItem(Number(product.id), selectedSize.apiSizeId, currentShoseQuantity);
+    const created = cartItemFromApi(response);
+    set((state) => ({ cartItems: [...state.cartItems, created] }));
+  },
+
+  setCurrentChoseQuantity: async (currentShoeseID, currentShoeseQuantity) => {
+    const current = get().cartItems.find((item) => item.currentShoeseID === currentShoeseID);
+    if (current?.cartItemId && getAccessToken()) {
+      const response = await commerceApi.updateCartItem(current.cartItemId, currentShoeseQuantity);
+      const updated = cartItemFromApi(response);
+      set((state) => ({ cartItems: state.cartItems.map((item) => item.cartItemId === updated.cartItemId ? updated : item) }));
+      return;
+    }
+    set((state) => ({
+      cartItems: state.cartItems.map((item) => item.currentShoeseID === currentShoeseID
+        ? { ...item, currentShoseQuantity: currentShoeseQuantity }
+        : item),
+    }));
+  },
+
+  deleteProductFromCart: async (currentShoeseID) => {
+    const current = get().cartItems.find((item) => item.currentShoeseID === currentShoeseID);
+    if (current?.cartItemId && getAccessToken()) await commerceApi.removeCartItem(current.cartItemId);
+    set((state) => ({ cartItems: state.cartItems.filter((item) => item.currentShoeseID !== currentShoeseID) }));
+  },
+
+  getTotalPrice: (cartItems) => cartItems.reduce(
+    (total, item) => total + item.currentShoseQuantity * parseFloat(item.product.productPrice),
+    0,
+  ),
+
+  getFinalPrice: () => Math.max(0, get().getTotalPrice(get().cartItems) - get().couponDiscountAmount),
+
+  addProductsToMyPurchases: (myPurchases, purchaseDate) => set({
+    myPurchases: [...myPurchases],
+    purchaseDate,
+    cartItems: [],
+    couponCode: null,
+    couponDiscountAmount: 0,
+    isDiscounted: false,
+  }),
+
+  clearCartAfterOrder: () => set({
+    cartItems: [],
+    couponCode: null,
+    couponDiscountAmount: 0,
+    isDiscounted: false,
+  }),
+
+  returnProduct: async (productID) => {
+    const key = typeof productID === 'string' ? productID : productID.id;
+    const purchase = get().myPurchases.find((item) => item.currentShoeseID === key || item.product.id === key);
+    if (purchase?.orderItemId && getAccessToken()) {
+      await commerceApi.createReturn(purchase.orderItemId);
+      set((state) => ({
+        myPurchases: state.myPurchases.map((item) => item.orderItemId === purchase.orderItemId
+          ? { ...item, returnStatus: 'requested' }
+          : item),
+      }));
+      return;
+    }
+    set((state) => ({
+      myPurchases: state.myPurchases.filter((item) => item.currentShoeseID !== key),
+      cartItems: state.cartItems.filter((item) => item.currentShoeseID !== key),
+    }));
+  },
+
+  editProductPriceAfterUseCoupon: () => {
+    // The backend owns final pricing. This no-op preserves the existing UI action signature.
+  },
+}));
+
 export default useCartStore;

@@ -24,9 +24,10 @@ const AddCoupon = () => {
                 <Field.ErrorText></Field.ErrorText>
             </Field.Root>
             <Button 
-            onClick={()=>{
-                addCoupon(newCoupon.trim());
-                setNewCoupon('')
+            onClick={() => {
+                const code = newCoupon.trim();
+                if (!code) return;
+                void addCoupon(code).then(() => setNewCoupon(''));
             }}
              bg={'blue'} marginTop={5}>Add Coupon</Button>
       </Box>

@@ -24,7 +24,7 @@ import PieChart from "./page/pieChart/PieChart";
 import LineChart from "./page/lineChart/LineChart";
 import Geography from "./page/geography/Geography";
 import NotFound from "./page/notFound/NotFound";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import AddProduct from "./page/AddEditProduct/AddEdit";
 import Products from "@/components/Products/Products";
 import Sale from "./page/sale/Sale";
@@ -33,6 +33,7 @@ import UsersReview from "./page/usersReviews/UsersReview";
 import Archive from "./page/archive/Archive";
 import SetCoupon from "./page/Coupon/SetCoupon";
 import ReturnPolicy from "./page/Replacement/ReturnPolicy";
+import useProductStore from "@/components/Products/ProductStore";
 const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
@@ -44,6 +45,11 @@ export default function AdminApp() {
   );
 
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+  const loadProducts = useProductStore((state) => state.loadProducts);
+
+  useEffect(() => {
+    void loadProducts();
+  }, [loadProducts]);
 
   return (
     <ThemeProvider theme={theme}>

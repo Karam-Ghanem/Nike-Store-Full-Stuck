@@ -1,11 +1,15 @@
 import MainTitle from "@/components/PublicCompontents/MainTitle"
 import { Box, Button, Container, Field, HStack, Input, Text } from "@chakra-ui/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useReturnStore from "./ReturnStore";
 
 const ReturnPolicy = () => {
   const [days,setDays] = useState<number|null>(0);
-  const {setReturnPeriod} = useReturnStore()
+  const {setReturnPeriod, loadReturnPolicy} = useReturnStore()
+
+  useEffect(() => {
+    void loadReturnPolicy();
+  }, [loadReturnPolicy]);
   return (
     <>
     <Container>
@@ -28,9 +32,9 @@ const ReturnPolicy = () => {
                 <Field.ErrorText></Field.ErrorText>
             </Field.Root>
             <Button 
-            onClick={()=>{
-              setReturnPeriod(days!)
-              setDays(null)
+            onClick={() => {
+              if (!days || days < 1) return;
+              void setReturnPeriod(days).then(() => setDays(null));
             }}
              bg={'blue'} marginTop={5}>Edit Product return period </Button>
       </Box>
