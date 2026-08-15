@@ -55,6 +55,7 @@ export async function apiRequest<T>(
 
   const response = await fetch(`${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`, {
     ...requestOptions,
+    cache: 'no-store',
     body,
     headers: requestHeaders,
   });

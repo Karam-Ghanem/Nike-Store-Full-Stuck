@@ -144,6 +144,27 @@ class CommerceApiTests(APITestCase):
         self.assertEqual(product.price, Decimal('60.00'))
         self.assertTrue(product.is_discounted)
 
+    def test_admin_created_product_is_public(self):
+        self.client.force_authenticate(user=self.admin)
+        create_response = self.client.post(
+            reverse('product-list'),
+            {
+                'name': 'Public Admin Shoe',
+                'description': 'Visible to shoppers',
+                'price': '120.00',
+                'gender': 'unisex',
+                'category_name': 'Training',
+                'sizes_data': [{'size': '41', 'stock': 8}],
+            },
+            format='json',
+        )
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        created_id = create_response.data['id']
+        self.client.force_authenticate(user=None)
+        public_response = self.client.get(reverse('product-list'))
+        self.assertEqual(public_response.status_code, status.HTTP_200_OK)
+        self.assertIn(created_id, [product['id'] for product in public_response.data])
+
     def test_admin_archive_bulk_discount_and_dashboard(self):
         self.client.force_authenticate(user=self.admin)
         archive_response = self.client.post(reverse('product-archive', args=[self.product.id]), {}, format='json')
