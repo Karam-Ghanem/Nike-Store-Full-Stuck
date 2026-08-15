@@ -15,7 +15,16 @@ import Wallet from "@/Pages/CheckOut/Wallet";
 import MyPurchases from "@/Pages/purchases/MyPurchases";
 import AuthPage from "@/Pages/Auth/AuthPage";
 
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import useAuthStore from "@/auth/authStore";
+
+function AdminRoute() {
+  const { user, initialized } = useAuthStore();
+  if (!initialized) return null;
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!user.is_staff) return <Navigate to="/" replace />;
+  return <AdminApp />;
+}
 const router = createBrowserRouter([
   {
     path: "/",
@@ -38,7 +47,7 @@ const router = createBrowserRouter([
   },
   {
     path: "admin",
-    element: <AdminApp />,
+    element: <AdminRoute />,
     children: [
       { path: "*", element: <NotFound /> },
     ],

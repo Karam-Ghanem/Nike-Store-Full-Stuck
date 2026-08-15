@@ -2,8 +2,12 @@ import Links from "./links";
 import { Container, Stack } from "@chakra-ui/react";
 import { Box, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import useAuthStore from "@/auth/authStore";
 
 const HeaderLinks = () => {
+  const isStaff = useAuthStore((state) => state.user?.is_staff === true);
+  const visibleLinks = Links.filter((link) => link.href !== "admin/dashboard" || isStaff);
+
   return (
     <Box className="hidden md:block">
       <Container>
@@ -11,7 +15,7 @@ const HeaderLinks = () => {
           direction="row"
           justifyContent={{ sm: "start", md: "start", lg: "space-between" }}
         >
-          {Links.map((link) => (
+          {visibleLinks.map((link) => (
             <Link to={link.href} key={link.id}>
               <Text
               

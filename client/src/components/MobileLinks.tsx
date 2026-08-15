@@ -11,6 +11,7 @@ import useAuthStore from "@/auth/authStore";
 const MobileLinks = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const visibleLinks = Links.filter((link) => link.href !== "admin/dashboard" || user?.is_staff === true);
   const navigate = useNavigate();
 
   const signOut = async () => {
@@ -33,7 +34,7 @@ const MobileLinks = () => {
               maxWidth="100%"
             >
               <Menu.Content marginLeft="-150px" marginTop="20px">
-                {Links.map((link) => (
+                {visibleLinks.map((link) => (
                   <Box
                     key={link.id}
                     borderBottom="1px solid #fcfc "
