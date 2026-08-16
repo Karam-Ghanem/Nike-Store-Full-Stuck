@@ -286,6 +286,8 @@ export const commerceApi = {
     method: 'POST',
     body: JSON.stringify({ order_item_id: orderItemId, reason }),
   }),
+  approveReturn: (returnId: number) => apiRequest<ApiReturnRequest>(`/returns/${returnId}/approve/`, { method: 'POST' }),
+  rejectReturn: (returnId: number) => apiRequest<ApiReturnRequest>(`/returns/${returnId}/reject/`, { method: 'POST' }),
   getReviews: (productId?: number) => apiRequest<ApiReview[]>(productId ? `/reviews/?product=${productId}` : '/reviews/', { authenticated: false }),
   createReview: (productId: number | null, rating: number, comment: string) => apiRequest<ApiReview>('/reviews/', {
     method: 'POST',

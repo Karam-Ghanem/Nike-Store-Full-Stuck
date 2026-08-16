@@ -33,6 +33,7 @@ import UsersReview from "./page/usersReviews/UsersReview";
 import Archive from "./page/archive/Archive";
 import SetCoupon from "./page/Coupon/SetCoupon";
 import ReturnPolicy from "./page/Replacement/ReturnPolicy";
+import ReturnRequests from "./page/Replacement/ReturnRequests";
 import AddAdmin from "./page/AddAdmin/AddAdmin";
 import useProductStore from "@/components/Products/ProductStore";
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -92,6 +93,7 @@ export default function AdminApp() {
 
               <Route path="coupon" element={<SetCoupon/>} />
               <Route path="return-policy" element={<ReturnPolicy/>} />
+              <Route path="return-requests" element={<ReturnRequests />} />
               <Route path="add-admin" element={<AddAdmin />} />
 
 

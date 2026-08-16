@@ -10,7 +10,8 @@ const AdminLinks = [
     {id:6,label:"Archive",href:"archive"},
     {id:7,label:"Review",href:"usersReview"},
     {id:8,label:"return-policy",href:"return-policy"},
-    {id:9,label:"coupon",href:"coupon"},
+    {id:9,label:"Return Requests",href:"return-requests"},
+    {id:10,label:"coupon",href:"coupon"},
 ]
 
 export default AdminLinks;

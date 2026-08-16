@@ -17,6 +17,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
+import AssignmentReturnOutlinedIcon from "@mui/icons-material/AssignmentReturnOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
@@ -52,6 +53,11 @@ const menu1 = [
     text: "Invoices Balances",
     icon: <ReceiptOutlinedIcon />,
     path: "/admin/invoices",
+  },
+  {
+    text: "Return Requests",
+    icon: <AssignmentReturnOutlinedIcon />,
+    path: "/admin/return-requests",
   },
 ];
 
