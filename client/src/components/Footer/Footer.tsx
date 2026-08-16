@@ -12,6 +12,7 @@ const Footer = () => {
         fontSize={{ base: 13, sm: 13,md:16, lg: 15, xl: 15 }}
         padding={10}
         paddingBottom={2}
+        className="storefront-footer-surface"
         justifyContent={"space-between"}
         columns={{ base: 1, sm: 2,md:2, lg: 4, xl: 4 }}
         bg={"#f3f1f1"}
