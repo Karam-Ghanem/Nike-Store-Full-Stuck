@@ -125,6 +125,39 @@ export interface ApiReview {
   created_at: string;
 }
 
+export interface AdminDashboardStatusSlice {
+  id: string;
+  label: string;
+  value: number;
+}
+
+export interface AdminDashboardRevenuePoint {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface AdminDashboardCategorySlice extends AdminDashboardStatusSlice {
+  revenue: number;
+}
+
+export interface AdminDashboardTopProduct {
+  id: number;
+  name: string;
+  quantity: number;
+  revenue: number;
+}
+
+export interface AdminDashboardTransaction {
+  id: number;
+  customer: string;
+  username: string;
+  date: string;
+  amount: number;
+  status: string;
+  items_count: number;
+}
+
 export interface AdminDashboardMetrics {
   total_orders: number;
   completed_orders: number;
@@ -135,6 +168,13 @@ export interface AdminDashboardMetrics {
   total_reviews: number;
   total_users: number;
   total_favorites: number;
+  pending_returns: number;
+  average_order_value: number;
+  status_breakdown: AdminDashboardStatusSlice[];
+  revenue_by_day: AdminDashboardRevenuePoint[];
+  sales_by_category: AdminDashboardCategorySlice[];
+  top_products: AdminDashboardTopProduct[];
+  recent_transactions: AdminDashboardTransaction[];
 }
 
 export interface ProductWritePayload {

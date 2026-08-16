@@ -1,7 +1,11 @@
 from decimal import Decimal, InvalidOperation
 
+from datetime import timedelta
+
 from django.db import transaction
-from django.db.models import F, Sum
+from django.db.models import Count, F, Sum
+from django.db.models.functions import TruncDate
+from django.utils import timezone
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.authtoken.models import Token
@@ -348,15 +352,85 @@ class AdminDashboardView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
+        completed_queryset = Order.objects.filter(status=Order.STATUS_COMPLETED)
         total_orders = Order.objects.count()
-        completed_orders = Order.objects.filter(status=Order.STATUS_COMPLETED).count()
+        completed_orders = completed_queryset.count()
         pending_orders = Order.objects.filter(status=Order.STATUS_PENDING).count()
-        total_sales = Order.objects.filter(status=Order.STATUS_COMPLETED).aggregate(total=Sum('total_amount'))['total'] or 0
+        total_sales = completed_queryset.aggregate(total=Sum('total_amount'))['total'] or 0
         active_products = Product.objects.filter(is_active=True, is_archived=False).count()
         archived_products = Product.objects.filter(is_archived=True).count()
         total_reviews = Review.objects.count()
         total_users = User.objects.count()
         total_favorites = Favorite.objects.count()
+        pending_returns = ReturnRequest.objects.filter(status=ReturnRequest.STATUS_REQUESTED).count()
+
+        status_breakdown = [
+            {'id': status, 'label': label, 'value': Order.objects.filter(status=status).count()}
+            for status, label in Order.STATUS_CHOICES
+        ]
+
+        today = timezone.localdate()
+        start_date = today - timedelta(days=29)
+        daily_rows = (
+            completed_queryset.filter(created_at__date__gte=start_date)
+            .annotate(day=TruncDate('created_at'))
+            .values('day')
+            .annotate(revenue=Sum('total_amount'), orders=Count('id'))
+            .order_by('day')
+        )
+        daily_lookup = {
+            row['day'].isoformat(): {
+                'date': row['day'].isoformat(),
+                'revenue': float(row['revenue'] or 0),
+                'orders': row['orders'],
+            }
+            for row in daily_rows
+        }
+        revenue_by_day = [
+            daily_lookup.get(
+                (start_date + timedelta(days=offset)).isoformat(),
+                {
+                    'date': (start_date + timedelta(days=offset)).isoformat(),
+                    'revenue': 0.0,
+                    'orders': 0,
+                },
+            )
+            for offset in range(30)
+        ]
+
+        category_totals = {}
+        product_totals = {}
+        completed_items = (
+            OrderItem.objects.filter(order__status=Order.STATUS_COMPLETED)
+            .select_related('product__category')
+        )
+        for item in completed_items:
+            quantity = item.quantity or 0
+            revenue = float((item.price or 0) * quantity)
+            category = item.product.category.name if item.product.category_id else 'Uncategorized'
+            category_key = category.lower().replace(' ', '-')
+            category_totals.setdefault(category_key, {'id': category_key, 'label': category, 'value': 0, 'revenue': 0.0})
+            category_totals[category_key]['value'] += quantity
+            category_totals[category_key]['revenue'] += revenue
+            product_totals.setdefault(item.product_id, {'id': item.product_id, 'name': item.product.name, 'quantity': 0, 'revenue': 0.0})
+            product_totals[item.product_id]['quantity'] += quantity
+            product_totals[item.product_id]['revenue'] += revenue
+
+        sales_by_category = sorted(category_totals.values(), key=lambda row: row['revenue'], reverse=True)
+        top_products = sorted(product_totals.values(), key=lambda row: (row['quantity'], row['revenue']), reverse=True)[:8]
+
+        recent_transactions = []
+        for order in Order.objects.select_related('user').prefetch_related('items').order_by('-created_at')[:8]:
+            recent_transactions.append({
+                'id': order.id,
+                'customer': order.full_name or order.user.username,
+                'username': order.user.username,
+                'date': order.created_at.isoformat(),
+                'amount': float(order.total_amount or 0),
+                'status': order.status,
+                'items_count': sum(item.quantity for item in order.items.all()),
+            })
+
         return Response({
             'total_orders': total_orders,
             'completed_orders': completed_orders,
@@ -367,4 +441,11 @@ class AdminDashboardView(APIView):
             'total_reviews': total_reviews,
             'total_users': total_users,
             'total_favorites': total_favorites,
+            'pending_returns': pending_returns,
+            'average_order_value': float(total_sales / completed_orders) if completed_orders else 0.0,
+            'status_breakdown': status_breakdown,
+            'revenue_by_day': revenue_by_day,
+            'sales_by_category': sales_by_category,
+            'top_products': top_products,
+            'recent_transactions': recent_transactions,
         })

@@ -6,12 +6,17 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import Line from "../../page/lineChart/Line";
 import { DownloadOutlined } from "@mui/icons-material";
-import { Transactions } from "./data";
+import Line from "../../page/lineChart/Line";
+import type { AdminDashboardMetrics } from "@/api/commerce";
 
-const Row2 = () => {
+interface Props {
+  metrics: AdminDashboardMetrics | null;
+}
+
+const Row2 = ({ metrics }: Props) => {
   const theme = useTheme();
+  const transactions = metrics?.recent_transactions ?? [];
 
   return (
     <Stack
@@ -22,7 +27,6 @@ const Row2 = () => {
       justifyContent="space-between"
       alignItems={{ xs: "center", md: "stretch" }}
     >
-      {/* LEFT CHART CARD */}
       <Paper
         sx={{
           flexGrow: 1,
@@ -32,12 +36,7 @@ const Row2 = () => {
           p: { xs: 1, sm: 1.5, md: 2 },
         }}
       >
-        <Stack
-          alignItems="center"
-          direction="row"
-          flexWrap="wrap"
-          justifyContent="space-between"
-        >
+        <Stack alignItems="center" direction="row" flexWrap="wrap" justifyContent="space-between">
           <Box>
             <Typography
               color={theme.palette.secondary.main}
@@ -50,27 +49,21 @@ const Row2 = () => {
             >
               Revenue Generated
             </Typography>
-
             <Typography
               variant="body2"
               ml={{ xs: 1, sm: 2, md: 4 }}
               fontSize={{ xs: "12px", sm: "13px", md: "14px" }}
             >
-              $59,342.32
+              {metrics ? `${metrics.total_sales.toFixed(2)} $` : "Loading..."}
             </Typography>
           </Box>
-
-          <Box>
-            <IconButton sx={{ mr: { xs: 1, sm: 2, md: 3 } }}>
-              <DownloadOutlined />
-            </IconButton>
-          </Box>
+          <IconButton sx={{ mr: { xs: 1, sm: 2, md: 3 } }} aria-label="Download revenue data">
+            <DownloadOutlined />
+          </IconButton>
         </Stack>
-
-        <Line isDahboard={true} />
+        <Line isDahboard points={metrics?.revenue_by_day} />
       </Paper>
 
-      {/* RIGHT TRANSACTIONS BOX */}
       <Box
         sx={{
           borderRadius: "4px",
@@ -92,38 +85,41 @@ const Row2 = () => {
           </Typography>
         </Paper>
 
-        {Transactions.map((item) => (
+        {transactions.length === 0 && (
+          <Paper sx={{ mt: 0.4, p: 2 }}>
+            <Typography color="text.secondary">No transactions yet.</Typography>
+          </Paper>
+        )}
+
+        {transactions.map((item) => (
           <Paper
-            key={item.txId}
+            key={item.id}
             sx={{
               mt: 0.4,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              gap: 1,
               p: { xs: 0.8, sm: 1 },
             }}
           >
-            <Box>
-              <Typography fontSize={{ xs: "11px", sm: "13px", md: "14px" }}>
-                {item.txId}
+            <Box sx={{ minWidth: 0 }}>
+              <Typography noWrap fontSize={{ xs: "11px", sm: "13px", md: "14px" }}>
+                #{item.id} · {item.customer}
               </Typography>
-              <Typography fontSize={{ xs: "10px", sm: "12px", md: "13px" }}>
-                {item.user}
+              <Typography color="text.secondary" fontSize={{ xs: "10px", sm: "12px", md: "13px" }}>
+                {new Date(item.date).toLocaleDateString()} · {item.items_count} items
               </Typography>
             </Box>
-
-            <Typography fontSize={{ xs: "11px", sm: "13px", md: "14px" }}>
-              {item.date}
-            </Typography>
-
             <Typography
               borderRadius={1.4}
               p={{ xs: 0.6, sm: 0.8, md: 1 }}
-              bgcolor={theme.palette.error.main}
-              color={theme.palette.getContrastText(theme.palette.error.main)}
+              bgcolor={item.status === "completed" ? theme.palette.success.main : theme.palette.warning.main}
+              color={theme.palette.getContrastText(item.status === "completed" ? theme.palette.success.main : theme.palette.warning.main)}
               fontSize={{ xs: "10px", sm: "12px", md: "13px" }}
+              whiteSpace="nowrap"
             >
-              ${item.cost}
+              ${item.amount.toFixed(2)}
             </Typography>
           </Paper>
         ))}

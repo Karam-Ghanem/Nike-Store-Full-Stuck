@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import Card from './card';
@@ -6,16 +5,20 @@ import EmailIcon from '@mui/icons-material/Email';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TrafficIcon from '@mui/icons-material/Traffic';
-import { data1, data2, data3, data4 } from './data';
-import { commerceApi, type AdminDashboardMetrics } from '@/api/commerce';
+import type { AdminDashboardMetrics } from '@/api/commerce';
 
-const Row1 = () => {
+interface Props {
+  metrics: AdminDashboardMetrics | null;
+}
+
+const metricPie = (value: number, id: string) => [
+  { id, label: id, value: Math.max(value, 1) },
+  { id: 'remaining', label: 'Remaining', value: 1 },
+];
+
+const Row1 = ({ metrics }: Props) => {
   const theme = useTheme();
-  const [metrics, setMetrics] = useState<AdminDashboardMetrics | null>(null);
-
-  useEffect(() => {
-    void commerceApi.getAdminDashboard().then(setMetrics).catch(() => undefined);
-  }, []);
+  const value = (key: keyof AdminDashboardMetrics) => Number(metrics?.[key] ?? 0);
 
   return (
     <Stack
@@ -30,7 +33,7 @@ const Row1 = () => {
         title={metrics ? String(metrics.total_reviews) : '—'}
         subTitle="Reviews"
         increase="Live"
-        data={data1}
+        data={metricPie(value('total_reviews'), 'reviews')}
         scheme="nivo"
       />
       <Card
@@ -38,7 +41,7 @@ const Row1 = () => {
         title={metrics ? `${metrics.total_sales.toFixed(2)} $` : '—'}
         subTitle="Sales obtained"
         increase="Live"
-        data={data2}
+        data={metricPie(value('total_sales'), 'sales')}
         scheme="category10"
       />
       <Card
@@ -46,7 +49,7 @@ const Row1 = () => {
         title={metrics ? String(metrics.total_users) : '—'}
         subTitle="Registered users"
         increase="Live"
-        data={data3}
+        data={metricPie(value('total_users'), 'users')}
         scheme="accent"
       />
       <Card
@@ -54,7 +57,7 @@ const Row1 = () => {
         title={metrics ? String(metrics.active_products) : '—'}
         subTitle="Active products"
         increase="Live"
-        data={data4}
+        data={metricPie(value('active_products'), 'products')}
         scheme="dark2"
       />
     </Stack>

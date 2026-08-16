@@ -1,21 +1,25 @@
 import { ResponsivePie } from "@nivo/pie";
 import { Box, useTheme } from "@mui/material";
 
-const data = [
-  { id: "React", label: "React", value: 272, color: "hsl(107, 70%, 50%)" },
-  { id: "stylus", label: "stylus", value: 543, color: "hsl(64, 70%, 50%)" },
-  { id: "sass", label: "sass", value: 401, color: "hsl(41, 70%, 50%)" },
-  { id: "haskell", label: "haskell", value: 434, color: "hsl(172, 70%, 50%)" },
-  { id: "nue", label: "nue", value: 333, color: "hsl(219, 70%, 50%)" },
-];
+interface PieSlice {
+  id: string;
+  label: string;
+  value: number;
+}
 
-const Pie = ({ isDashbord = false }) => {
+interface Props {
+  isDashbord?: boolean;
+  data?: PieSlice[];
+}
+
+const Pie = ({ isDashbord = false, data = [] }: Props) => {
   const theme = useTheme();
+  const chartData = data.length > 0 ? data : [{ id: "No data", label: "No data", value: 1 }];
 
   return (
     <Box sx={{ height: isDashbord ? "200px" : "75vh" }}>
       <ResponsivePie
-        data={data}
+        data={chartData}
         theme={{
           axis: {
             domain: {
