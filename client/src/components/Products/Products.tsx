@@ -36,7 +36,7 @@ const Products = ({ homePage,edit_delete }: Props) => {
     currentPage,
     setCurrentPage,
     needed,
-  } = useProductPagentaion();
+  } = useProductPagentaion(homePage);
 
   const {
     products,

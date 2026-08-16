@@ -7,7 +7,7 @@ import FollwUs from "./FollwUs";
 const Footer = () => {
   return (
     
-    <Container marginTop={40} className="mt-auto" >
+    <Container marginTop={40} className="storefront-footer mt-auto" >
       <SimpleGrid
         fontSize={{ base: 13, sm: 13,md:16, lg: 15, xl: 15 }}
         padding={10}

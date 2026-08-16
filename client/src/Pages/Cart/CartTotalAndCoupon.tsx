@@ -50,6 +50,7 @@ const CartTotalAndCoupon = () => {
           <Button
             mt={6}
             w="100%"
+            className="storefront-checkout-button"
             bg="#ba1e9a"
             color="white"
             borderRadius="full"
