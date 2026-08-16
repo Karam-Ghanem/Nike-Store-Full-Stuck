@@ -188,6 +188,36 @@ class CommerceApiTests(APITestCase):
         self.assertIn('total_users', dashboard_response.data)
         self.assertIn('active_products', dashboard_response.data)
 
+    def test_admin_can_create_staff_account(self):
+        self.client.force_authenticate(user=self.admin)
+        create_response = self.client.post(
+            reverse('admin_register'),
+            {'username': 'secondadmin', 'email': 'secondadmin@example.com', 'password': 'admin-pass-456'},
+            format='json',
+        )
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(create_response.data['is_staff'])
+        second_admin = User.objects.get(username='secondadmin')
+        self.assertTrue(second_admin.is_staff)
+        self.assertFalse(second_admin.is_superuser)
+
+        self.client.force_authenticate(user=self.customer)
+        forbidden_response = self.client.post(
+            reverse('admin_register'),
+            {'username': 'blockedadmin', 'email': 'blocked@example.com', 'password': 'admin-pass-456'},
+            format='json',
+        )
+        self.assertEqual(forbidden_response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(user=None)
+        login_response = self.client.post(
+            reverse('login'),
+            {'username': 'secondadmin', 'password': 'admin-pass-456'},
+            format='json',
+        )
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(login_response.data['is_staff'])
+
     def test_authentication_endpoints(self):
         register_response = self.client.post(
             reverse('register'),

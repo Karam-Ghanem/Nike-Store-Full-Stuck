@@ -27,6 +27,7 @@ from .serializers import (
     CategorySerializer,
     CouponSerializer,
     CouponValidationSerializer,
+    AdminRegisterSerializer,
     FavoriteSerializer,
     OrderCreateSerializer,
     OrderSerializer,
@@ -316,6 +317,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class AdminRegisterView(generics.CreateAPIView):
+    serializer_class = AdminRegisterSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 
 class CurrentUserView(APIView):

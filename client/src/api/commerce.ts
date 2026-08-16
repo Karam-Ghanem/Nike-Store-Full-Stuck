@@ -253,6 +253,11 @@ export const commerceApi = {
   }),
   deleteReview: (reviewId: number) => apiRequest<void>(`/reviews/${reviewId}/`, { method: 'DELETE' }),
   getAdminDashboard: () => apiRequest<AdminDashboardMetrics>('/admin/dashboard/'),
+  createAdmin: (payload: { username: string; email: string; password: string }) =>
+    apiRequest<{ id: number; username: string; email: string; is_staff: boolean }>('/auth/admin-register/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
   createProduct: (payload: ProductWritePayload) => apiRequest<ApiProduct>('/products/', {
     method: 'POST',
     body: productFormData(payload),

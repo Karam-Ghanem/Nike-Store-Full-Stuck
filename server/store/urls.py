@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AdminDashboardView,
+    AdminRegisterView,
     CartItemViewSet,
     CategoryViewSet,
     CouponViewSet,
@@ -33,6 +34,7 @@ urlpatterns = [
     path('return-policy/', ReturnPolicyView.as_view(), name='return_policy'),
     path('admin/dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
     path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/admin-register/', AdminRegisterView.as_view(), name='admin_register'),
     path('auth/login/', CustomObtainAuthToken.as_view(), name='login'),
     path('auth/user/', CurrentUserView.as_view(), name='current_user'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),

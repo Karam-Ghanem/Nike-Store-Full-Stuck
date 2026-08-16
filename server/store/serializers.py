@@ -351,6 +351,30 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
 
 
+class AdminRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+    is_staff = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'is_staff']
+        read_only_fields = ['id', 'is_staff']
+
+    def validate_username(self, value):
+        return value.strip()
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password'],
+        )
+        user.is_staff = True
+        user.is_active = True
+        user.save(update_fields=['is_staff', 'is_active'])
+        return user
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
     product = ProductSerializer(read_only=True, allow_null=True)

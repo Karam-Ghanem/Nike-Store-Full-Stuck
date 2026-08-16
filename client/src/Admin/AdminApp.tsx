@@ -33,6 +33,7 @@ import UsersReview from "./page/usersReviews/UsersReview";
 import Archive from "./page/archive/Archive";
 import SetCoupon from "./page/Coupon/SetCoupon";
 import ReturnPolicy from "./page/Replacement/ReturnPolicy";
+import AddAdmin from "./page/AddAdmin/AddAdmin";
 import useProductStore from "@/components/Products/ProductStore";
 const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
@@ -91,6 +92,7 @@ export default function AdminApp() {
 
               <Route path="coupon" element={<SetCoupon/>} />
               <Route path="return-policy" element={<ReturnPolicy/>} />
+              <Route path="add-admin" element={<AddAdmin />} />
 
 
               <Route path="usersReview" element={<UsersReview />} />

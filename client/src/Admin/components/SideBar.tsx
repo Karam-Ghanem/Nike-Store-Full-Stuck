@@ -18,6 +18,7 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -41,6 +42,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 const menu1 = [
   { text: "Dashboard", icon: <HomeOutlinedIcon />, path: "dashboard" },
   { text: "Manage Team", icon: <PeopleOutlinedIcon />, path: "team" },
+  { text: "Add Admin", icon: <PersonAddOutlinedIcon />, path: "/admin/add-admin" },
   {
     text: "Contacts Information",
     icon: <ContactsOutlinedIcon />,
