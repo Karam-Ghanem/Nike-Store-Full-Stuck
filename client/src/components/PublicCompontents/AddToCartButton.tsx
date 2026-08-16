@@ -53,7 +53,7 @@ const AddToCartButton = ({
       textAlign="center"
       width="fit-content"
       borderRadius="20px"
-      className={!isAdded ? "bg-linear-to-r from-purple-400 via-pink-500 to-red-500" : "bg-green-600 "}
+      className={`storefront-add-to-cart ${!isAdded ? "bg-linear-to-r from-purple-400 via-pink-500 to-red-500" : "is-added bg-green-600"}`}
     >
       <Toaster />
       {isEnoughQuantity ? (

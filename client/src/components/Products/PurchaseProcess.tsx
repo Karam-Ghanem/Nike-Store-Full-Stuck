@@ -15,6 +15,7 @@ const PurchaseProcess = ({item}:Props) => {
         <Button
         fontSize={{base:6,sm:10 ,md:12 ,lg:15 }}
         width={{base:'20px',sm:"60px" ,md:"80px" ,lg:"100px" }}
+          className="storefront-product-cart-button"
           bg={
             cartItems.map((item) => item.product.id).includes(item!.id)
               ? "green"
