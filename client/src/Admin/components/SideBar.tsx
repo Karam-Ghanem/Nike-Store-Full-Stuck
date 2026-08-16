@@ -55,6 +55,11 @@ const menu1 = [
     path: "/admin/invoices",
   },
   {
+    text: "All Orders",
+    icon: <ReceiptOutlinedIcon />,
+    path: "/admin/orders",
+  },
+  {
     text: "Return Requests",
     icon: <AssignmentReturnOutlinedIcon />,
     path: "/admin/return-requests",
