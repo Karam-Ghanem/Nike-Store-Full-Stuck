@@ -36,7 +36,7 @@ interface CartStore {
   getFinalPrice: () => number;
   addProductsToMyPurchases: (myPurchases: CatrtItem[], purchaseDate: Date) => void;
   clearCartAfterOrder: () => void;
-  returnProduct: (productID: string | Product) => Promise<void>;
+  returnProduct: (productID: string | Product, reason?: string) => Promise<void>;
   editProductPriceAfterUseCoupon: () => void;
 }
 
@@ -166,11 +166,11 @@ const useCartStore = create<CartStore>((set, get) => ({
     isDiscounted: false,
   }),
 
-  returnProduct: async (productID) => {
+  returnProduct: async (productID, reason = '') => {
     const key = typeof productID === 'string' ? productID : productID.id;
     const purchase = get().myPurchases.find((item) => item.currentShoeseID === key || item.product.id === key);
     if (purchase?.orderItemId && getAccessToken()) {
-      await commerceApi.createReturn(purchase.orderItemId);
+      await commerceApi.createReturn(purchase.orderItemId, reason.trim());
       set((state) => ({
         myPurchases: state.myPurchases.map((item) => item.orderItemId === purchase.orderItemId
           ? { ...item, returnStatus: 'requested' }

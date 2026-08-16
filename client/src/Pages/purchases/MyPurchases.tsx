@@ -3,6 +3,9 @@ import {
   Box,
   Button,
   Card,
+  CloseButton,
+  Dialog,
+  Field,
   Flex,
   HStack,
   Image,
@@ -10,6 +13,7 @@ import {
   Portal,
   Table,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 import { MdInfoOutline } from "react-icons/md";
 
@@ -25,22 +29,26 @@ const MyPurchases = () => {
   const returnPeriod = useReturnStore((state) => state.returnPeriod);
   const loadReturnPolicy = useReturnStore((state) => state.loadReturnPolicy);
   const [allowed, setAllowed] = useState(false);
+  const [returnTarget, setReturnTarget] = useState<string | null>(null);
+  const [returnReason, setReturnReason] = useState('');
 
   useEffect(() => {
     void loadPurchases();
     void loadReturnPolicy();
   }, [loadPurchases, loadReturnPolicy]);
 
-  const requestReturn = async (itemKey: string) => {
+  const requestReturn = async (itemKey: string, reason = '') => {
     try {
-      await returnProduct(itemKey);
+      await returnProduct(itemKey, reason);
       toaster.create({ title: 'Your return request has been submitted.', type: 'success', duration: 4000 });
+      return true;
     } catch (error) {
       toaster.create({
         title: error instanceof Error ? error.message : 'Unable to submit the return request.',
         type: 'error',
         duration: 5000,
       });
+      return false;
     }
   };
 
@@ -55,6 +63,61 @@ const MyPurchases = () => {
   return (
     <>
       <Toaster />
+      <Dialog.Root
+        open={Boolean(returnTarget)}
+        onOpenChange={({ open }) => {
+          if (!open) {
+            setReturnTarget(null);
+            setReturnReason('');
+          }
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Request Product Return</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Text mb={3}>You can tell us why you want to return this product, or leave the field empty.</Text>
+                <Field.Root>
+                  <Field.Label>Reason (optional)</Field.Label>
+                  <Textarea
+                    value={returnReason}
+                    onChange={(event) => setReturnReason(event.target.value)}
+                    placeholder="Tell us the reason for the return (optional)"
+                    border="1px solid #a800b7"
+                    rows={4}
+                  />
+                </Field.Root>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Dialog.ActionTrigger asChild>
+                  <Button variant="outline">Cancel</Button>
+                </Dialog.ActionTrigger>
+                <Button
+                  bg="#7008e7"
+                  color="white"
+                  onClick={async () => {
+                    if (!returnTarget) return;
+                    const success = await requestReturn(returnTarget, returnReason);
+                    if (success) {
+                      setReturnTarget(null);
+                      setReturnReason('');
+                    }
+                  }}
+                >
+                  Submit Return
+                </Button>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
       <MainTitle title="MY PURCHASES" />
 
       <Box maxW="1100px" mx="auto" p={{ base: 2, md: 6 }}>
@@ -138,7 +201,10 @@ const MyPurchases = () => {
                             fontSize={{ base: "7px", sm: "12px", md: "16px", lg: "20px" }}
                             bg="#7008e7"
                             _hover={{ backgroundColor: "#E53935", color: "#333" }}
-                            onClick={() => void requestReturn(purchase.currentShoeseID)}
+                            onClick={() => {
+                              setReturnTarget(purchase.currentShoeseID);
+                              setReturnReason('');
+                            }}
                           >
                             Return
                           </Button>
