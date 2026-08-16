@@ -14,7 +14,7 @@ const Header = () => {
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        className="shadow-lg  rounded-md"
+        className="storefront-header shadow-lg rounded-md"
       >
         {/* logo */}
         <HeaderLogo />

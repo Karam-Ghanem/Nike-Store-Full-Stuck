@@ -60,3 +60,197 @@ transform: scale(0.8);
   scrollbar-width: auto;
   scrollbar-color: #b55ac0 #f3d1f4;
 }
+
+/* Storefront-only color system. Dashboard has its own MUI theme and is intentionally excluded. */
+html.dark:has(.storefront-shell) {
+  color-scheme: dark;
+}
+
+html.dark:has(.storefront-shell) body {
+  background: #0b1120;
+  color: #e5e7eb;
+}
+
+html.dark .storefront-shell {
+  --store-bg: #0b1120;
+  --store-surface: #111827;
+  --store-surface-raised: #172033;
+  --store-border: #273449;
+  --store-text: #f3f4f6;
+  --store-muted: #aab6c8;
+  --store-primary: #c084fc;
+  --store-primary-strong: #a855f7;
+  --store-accent: #f0abfc;
+  background: var(--store-bg);
+  color: var(--store-text);
+}
+
+html.dark .storefront-shell a {
+  color: var(--store-primary);
+}
+
+html.dark .storefront-shell p,
+html.dark .storefront-shell label,
+html.dark .storefront-shell small,
+html.dark .storefront-shell [class*="chakra-text"] {
+  color: var(--store-muted);
+}
+
+html.dark .storefront-shell h1,
+html.dark .storefront-shell h2,
+html.dark .storefront-shell h3,
+html.dark .storefront-shell h4,
+html.dark .storefront-shell h5,
+html.dark .storefront-shell h6 {
+  color: var(--store-text);
+}
+
+html.dark .storefront-shell header,
+html.dark .storefront-shell footer,
+html.dark .storefront-shell [role="dialog"],
+html.dark .storefront-shell [class*="chakra-card"],
+html.dark .storefront-shell [class*="chakra-menu__content"],
+html.dark .storefront-shell [class*="chakra-popover__content"] {
+  background: var(--store-surface);
+  color: var(--store-text);
+  border-color: var(--store-border);
+}
+
+html.dark .storefront-shell input,
+html.dark .storefront-shell textarea,
+html.dark .storefront-shell select,
+html.dark .storefront-shell [role="textbox"] {
+  background: var(--store-surface-raised);
+  color: var(--store-text);
+  border-color: var(--store-border);
+}
+
+html.dark .storefront-shell input::placeholder,
+html.dark .storefront-shell textarea::placeholder {
+  color: #718096;
+}
+
+html.dark .storefront-shell button:not([aria-label="Toggle color mode"]) {
+  border-color: var(--store-border);
+}
+
+html.dark .storefront-shell button[aria-label="Toggle color mode"] {
+  color: var(--store-accent);
+  background: var(--store-surface-raised);
+}
+
+html.dark .storefront-shell img {
+  border-color: var(--store-border);
+}
+
+html.dark .storefront-shell [class*="chakra-separator"] {
+  border-color: var(--store-border);
+}
+
+html.dark .storefront-shell ::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+html.dark .storefront-shell ::-webkit-scrollbar-thumb {
+  background: #7e22ce;
+  border-color: #111827;
+}
+
+html.dark .storefront-shell ::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+
+html.dark .storefront-shell,
+html.dark .storefront-shell * {
+  scrollbar-color: #7e22ce #111827;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .storefront-shell,
+  .storefront-shell * {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 180ms;
+  }
+}
+
+@media (max-width: 768px) {
+  html.dark .storefront-shell {
+    --store-surface: #0f172a;
+    --store-surface-raised: #1e293b;
+  }
+}
+
+html.light .storefront-shell {
+  color-scheme: light;
+}
+
+html.light .storefront-shell,
+html.light .storefront-shell * {
+  scrollbar-color: #b55ac0 #f3d1f4;
+}
+
+html.light .storefront-shell {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+html.light .storefront-shell a {
+  color: #7008e7;
+}
+
+html.light .storefront-shell input,
+html.light .storefront-shell textarea,
+html.light .storefront-shell select {
+  color: #1f2937;
+}
+
+html.light .storefront-shell ::-webkit-scrollbar-track {
+  background: #f3d1f4;
+}
+
+html.light .storefront-shell ::-webkit-scrollbar-thumb {
+  background: #b55ac0;
+  border-color: #f3d1f4;
+}
+
+html.light .storefront-shell ::-webkit-scrollbar-thumb:hover {
+  background: #9e3fa9;
+}
+
+body {
+  margin: 0;
+}
+
+.storefront-shell {
+  min-height: 100vh;
+}
+
+.storefront-shell > div {
+  min-height: 100vh;
+}
+
+html.dark .storefront-shell .storefront-header {
+  background: #111827;
+  color: #f3f4f6;
+  border: 1px solid #273449;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+html.dark .storefront-shell .storefront-header a,
+html.dark .storefront-shell .storefront-header button {
+  color: #e9d5ff;
+}
+
+html.dark .storefront-shell .storefront-header a:hover,
+html.dark .storefront-shell .storefront-header button:hover {
+  color: #f0abfc;
+}
+
+html.dark .storefront-shell .storefront-header svg {
+  color: currentColor;
+}
+
+html.dark .storefront-shell .storefront-header [data-part="menu-content"] {
+  background: #172033;
+  color: #f3f4f6;
+}

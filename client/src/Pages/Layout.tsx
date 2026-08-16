@@ -10,7 +10,7 @@ import '@/index.css'
 const Layout = () => {
   const location = useLocation();
   return (
-    <>
+    <div className="storefront-shell">
     <Container>
         <Flex justifyContent={'space-between'} flexDir={'column'} minHeight={'100%'}>
         <Header />
@@ -22,9 +22,10 @@ const Layout = () => {
           </PageTransition>
         </AnimatePresence>
         <Footer />
-      </Flex>
-    </Container>
-    </>
+            </Flex>
+      </Container>
+    </div>
+
   );
 };
 
