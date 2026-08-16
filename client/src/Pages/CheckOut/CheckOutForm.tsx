@@ -1,8 +1,11 @@
+import { useEffect } from "react";
 import {Button, Textarea} from "@chakra-ui/react";
 import { Accordion, Span } from "@chakra-ui/react";
 import { Field, Input, Stack } from "@chakra-ui/react";
 import type { AdressForm } from "./CheckOut";
 import useCheckOut from "./Hooks/useCheckOut";
+import useAuthStore from "@/auth/authStore";
+import useCheckoutStore from "./checkoutStore";
 
 
 interface Props{
@@ -14,6 +17,23 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
 
 
   const {adress,setAdress,adressValue,setAdressValue,} = useCheckOut();
+  const user = useAuthStore((state) => state.user);
+  const savedAddress = useCheckoutStore((state) => state.addressForm);
+
+  useEffect(() => {
+    const name = savedAddress?.name || user?.username || '';
+    const email = savedAddress?.email || user?.email || '';
+    setAdress((current) => ({
+      ...current,
+      name: current.name || name,
+      email: current.email || email,
+    }));
+    setAdressValue((current) => ({
+      ...current,
+      name: current.name || name,
+      email: current.email || email,
+    }));
+  }, [savedAddress?.email, savedAddress?.name, user?.email, user?.username, setAdress, setAdressValue]);
   
   return (
     <Accordion.Root collapsible>
@@ -43,6 +63,7 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
                     }}
                     border={"1px solid #a800b7"}
                     placeholder="Name"
+                    autoComplete="name"
                   />
                   <Field.ErrorText></Field.ErrorText>
                 </Field.Root>
@@ -57,6 +78,7 @@ const CheckOutForm = ({sendAdressForm}:Props) => {
                     }}
                     border={"1px solid #a800b7"}
                     placeholder="Email"
+                    autoComplete="email"
                   />
                   <Field.ErrorText></Field.ErrorText>
                 </Field.Root>
