@@ -852,3 +852,227 @@ export default JotformShoeAssistant;
 [5]: https://www.typescriptlang.org/docs/handbook/declaration-files/deep-dive.html "TypeScript Declaration Files"
 
 [6]: https://chakra-ui.com/docs/components/box "Chakra UI Box"
+
+
+---
+
+# تحديث لاحق: تحويل المساعد إلى زر ثابت وPopup عام
+
+## سبب التعديل
+
+في النسخة الأولى كان iframe الخاص بالمساعد يظهر كقسم كامل داخل Homepage، ولذلك كان يأخذ مساحة ثابتة قدرها 688 بكسل من الصفحة. بناءً على متطلب التصميم الجديد، تم تحويله إلى زر عائم ثابت في أسفل الشاشة من الجهة اليمنى. لا يظهر محتوى المحادثة إلا بعد ضغط المستخدم على الزر، وبذلك تبقى Homepage وبقية صفحات المتجر أكثر اختصاراً.
+
+## المجلدات والملفات في التحديث
+
+لم تتم إضافة مجلد جديد في هذا التحديث، لأن المكوّن المستقل الذي أُنشئ في المرحلة السابقة كان المكان المناسب لتجميع سلوك المساعد. تم تعديل ملفين:
+
+| المسار | نوع التعديل | الوظيفة الجديدة |
+|---|---|---|
+| `client/src/components/JotformShoeAssistant/JotformShoeAssistant.tsx` | تعديل | زر ثابت، حالة Popup، إغلاق بالنقر على الخلفية أو Escape، وiframe عند الفتح |
+| `client/src/Pages/Layout.tsx` | تعديل | عرض المكوّن مرة واحدة داخل Layout العام |
+
+أما `Landing.tsx` فكان يحتوي الاستدعاء القديم للمساعد من المرحلة الأولى، ولذلك أزيل منه الاستدعاء عند تطبيق النسخة العامة الجديدة حتى لا يظهر المساعد مرتين. في النسخة النهائية يكون مصدر العرض هو `Layout.tsx` فقط.
+
+## إضافة حالة الفتح والإغلاق
+
+أضيفت حالة React:
+
+```tsx
+const [isOpen, setIsOpen] = useState(false);
+```
+
+عندما تكون القيمة `false` يظهر الزر فقط، وعندما تصبح `true` يظهر Overlay والـ iframe. يتم فتح النافذة من خلال:
+
+```tsx
+<Button onClick={() => setIsOpen(true)}>
+  Shoe Assistant
+</Button>
+```
+
+ويتم إغلاقها من خلال زر الإغلاق:
+
+```tsx
+<CloseButton onClick={() => setIsOpen(false)} />
+```
+
+كما تغلق عند النقر على الخلفية الداكنة:
+
+```tsx
+<Box onClick={() => setIsOpen(false)}>
+  <Box onClick={(event) => event.stopPropagation()}>
+    {/* popup content */}
+  </Box>
+</Box>
+```
+
+يمنع `stopPropagation` إغلاق النافذة عند النقر داخل محتوى المساعد نفسه؛ لأن الحدث يجب أن يصل إلى عناصر المحادثة لا إلى Overlay.
+
+## زر ثابت في أسفل اليمين
+
+```tsx
+<Button
+  position="fixed"
+  right={{ base: 4, md: 8 }}
+  bottom={{ base: 4, md: 8 }}
+  zIndex={1000}
+  colorPalette="purple"
+  borderRadius="full"
+  boxShadow="lg"
+  onClick={() => setIsOpen(true)}
+>
+  Shoe Assistant
+</Button>
+```
+
+الخاصية `position="fixed"` تربط الزر بإطار المتصفح لا بمكانه الطبيعي داخل الصفحة. لذلك يبقى في أسفل اليمين أثناء التمرير، ويظهر فوق محتوى المتجر. أما `zIndex={1000}` فيضمن بقاءه فوق البطاقات والصور، بينما يستخدم الـ Overlay قيمة أعلى `zIndex={1100}` حتى يغطي الموقع عند فتح Popup.
+
+القيم المتجاوبة تعني أن المسافة من اليمين والأسفل أصغر على الهاتف وأكبر على الشاشات المتوسطة والكبيرة. و`borderRadius="full"` يحول الزر إلى شكل كبسولة مستديرة يتناسب مع كونه زر مساعد عائم.
+
+## نافذة Popup
+
+```tsx
+<Box
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="shoe-assistant-title"
+  position="fixed"
+  inset={0}
+  zIndex={1100}
+  background="rgba(0, 0, 0, 0.68)"
+  display="flex"
+  alignItems="center"
+  justifyContent="center"
+  padding={{ base: 3, md: 6 }}
+>
+```
+
+`inset={0}` يجعل Overlay يغطي أعلى وأسفل ويمين ويسار الشاشة. وتمت إضافة `role="dialog"` و`aria-modal="true"` حتى تفهم التقنيات المساعدة أن المحتوى نافذة حوار مؤقتة. يتم وضع صندوق أبيض في الوسط بعرض أقصى 960 بكسل، وارتفاع مناسب للشاشات الصغيرة والكبيرة.
+
+```tsx
+<Box
+  position="relative"
+  width="100%"
+  maxW="960px"
+  height={{ base: "calc(100vh - 24px)", md: "760px" }}
+  background="white"
+  borderRadius="xl"
+  overflow="hidden"
+  boxShadow="2xl"
+>
+```
+
+على الهاتف يستخدم الصندوق معظم ارتفاع الشاشة مع ترك هامش 12 بكسل تقريباً من كل طرف، وعلى الشاشات الأكبر يثبت الارتفاع عند 760 بكسل. هذا يمنع خروج Popup عن الشاشة ويجعل تجربة الاستخدام مناسبة للأجهزة المختلفة.
+
+## تحميل Jotform عند فتح Popup فقط
+
+في النسخة الجديدة، تم نقل تشغيل السكربت إلى حالة `isOpen`:
+
+```tsx
+useEffect(() => {
+  if (!isOpen) return;
+
+  const runEmbedHandler = () => {
+    window.jotformEmbedHandler?.(
+      `iframe[id='${JOTFORM_IFRAME_ID}']`,
+      JOTFORM_ORIGIN,
+    );
+  };
+
+  // تحميل سكربت Jotform عند فتح النافذة
+}, [isOpen]);
+```
+
+هذا يعني أن المساعد الخارجي لا يبدأ تحميله أثناء فتح صفحات المتجر، بل عند طلب المستخدم. عند الإغلاق يتم Unmount للجزء الخاص بالـ iframe، وعند الفتح اللاحق يعاد تهيئته.
+
+## الإغلاق بواسطة Escape
+
+أضيف مستمع لوحة المفاتيح:
+
+```tsx
+useEffect(() => {
+  if (!isOpen) return;
+
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") setIsOpen(false);
+  };
+
+  document.addEventListener("keydown", handleEscape);
+  return () => document.removeEventListener("keydown", handleEscape);
+}, [isOpen]);
+```
+
+هذا يجعل إغلاق Popup ممكناً دون استخدام الفأرة، وهو سلوك متوقع في النوافذ المنبثقة ويحسن قابلية الوصول.
+
+## إدراج المساعد في Layout العام
+
+تم تعديل `client/src/Pages/Layout.tsx` بإضافة الاستيراد:
+
+```tsx
+import JotformShoeAssistant from
+  "@/components/JotformShoeAssistant/JotformShoeAssistant";
+```
+
+ثم وضع المكوّن مرة واحدة بعد Footer:
+
+```tsx
+<Footer />
+<JotformShoeAssistant />
+```
+
+يحتوي Layout على `Outlet` الذي يعرض صفحات المتجر العامة، مثل Home وProducts وAbout وReview وServices وCart وFavorites وCheckout وMy Purchases وAuth. لذلك فإن إضافة المكوّن داخل Layout تجعله مشتركاً بين هذه المسارات كلها، بدلاً من تكرار الاستدعاء داخل كل صفحة.
+
+## لماذا لا يظهر على Dashboard؟
+
+مسار Dashboard منفصل عن Layout العام:
+
+```tsx
+{
+  path: "/",
+  element: <Layout />,
+  children: [/* storefront routes */],
+},
+{
+  path: "admin",
+  element: <AdminRoute />,
+}
+```
+
+لذلك يظهر زر المساعد في صفحات المتجر التي تستخدم `Layout`، ولا يتم إدخاله داخل `AdminApp`. وبذلك بقي تصميم Dashboard وMUI الخاص بها مستقلاً كما طلب صاحب المشروع.
+
+## اختبار التغيير الجديد
+
+تم تشغيل:
+
+```bash
+cd client
+npm run build
+```
+
+وكانت النتيجة:
+
+```text
+✓ built in 1.96s
+```
+
+مرّ فحص TypeScript وبناء Vite بنجاح. كما تم التحقق من أن رابط Jotform الصحيح يعرض Agent بعنوان `Ula`، وأن النسخة السابقة ذات المعرّف الخاطئ تعرض `Agent not found`.
+
+في الاختبار المحلي الأول ظهرت واجهة Jotform داخل Homepage. وبعد تحويلها إلى Popup أصبح المطلوب التحقّق من المسار التالي عند تشغيل التطبيق: يظهر زر `Shoe Assistant` ثابتاً أسفل اليمين، وعند الضغط عليه يظهر Overlay وPopup، ثم تظهر داخله عناصر Chat وVoice وHistory وحقل `Type here`. ولم تُسجّل أخطاء بناء في هذا التغيير.
+
+## الفرق النهائي في الاستخدام
+
+| قبل التحديث | بعد التحديث |
+|---|---|
+| iframe ظاهر كقسم كامل داخل Homepage | زر صغير ثابت أسفل يمين الشاشة |
+| تحميل المساعد ضمن محتوى الصفحة | تحميله عند فتح Popup |
+| المساعد ظاهر في Homepage فقط | الزر متاح في كل صفحات Layout العام |
+| لا يوجد إغلاق خاص بالنافذة | إغلاق بزر X أو بالنقر على الخلفية أو Escape |
+| جزء من Landing | مكوّن عام مستدعى من Layout |
+| Dashboard خارج نطاق الاختبار | Dashboard بقي منفصلاً دون تغيير |
+
+# المراجع المضافة للتحديث
+
+[7]: https://react.dev/reference/react/useState "React useState Reference"
+
+[8]: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/dialog_role "ARIA dialog role"
+
+[9]: https://developer.mozilla.org/en-US/docs/Web/CSS/position "CSS position property"

@@ -4,6 +4,7 @@ import { Container, Flex } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
+import JotformShoeAssistant from "@/components/JotformShoeAssistant/JotformShoeAssistant";
 import '@/index.css'
 
 
@@ -22,6 +23,7 @@ const Layout = () => {
           </PageTransition>
         </AnimatePresence>
         <Footer />
+        <JotformShoeAssistant />
             </Flex>
       </Container>
     </div>

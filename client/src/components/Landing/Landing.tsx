@@ -7,7 +7,6 @@ import TextReview from "../../Pages/Review/TextReview";
 import Services from "@/Pages/Services/Services";
 import WelcomeBack from "../WelcomeBack/WelcomeBack";
 import MainTitle from "../PublicCompontents/MainTitle";
-import JotformShoeAssistant from "../JotformShoeAssistant/JotformShoeAssistant";
 
 const Landing = () => {
 
@@ -84,8 +83,6 @@ const Landing = () => {
       <TextReview />
       {/* Services */}
       <Services />
-      {/* AI shoe-selection assistant */}
-      <JotformShoeAssistant />
       {/* Welcome Back */}
       <WelcomeBack />
     </Container>
