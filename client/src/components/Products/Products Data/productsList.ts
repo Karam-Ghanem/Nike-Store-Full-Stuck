@@ -16,6 +16,10 @@ export interface SizeAndQuantity{
 export interface Product{
     id: string;
     productImg: string | undefined;
+    rearView?: string;
+    topView?: string;
+    sideView1?: string;
+    sideView2?: string;
     productName: string;
     productDescription: string;
     productPrice: string;
@@ -28,6 +32,10 @@ export interface Product{
     sizesAndQuantities:SizeAndQuantity[];
     favoriteId?: number;
     imageFile?: File;
+    rearViewFile?: File;
+    topViewFile?: File;
+    sideView1File?: File;
+    sideView2File?: File;
 }
 
 const ProductsList =[

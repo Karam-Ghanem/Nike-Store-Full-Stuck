@@ -36,6 +36,12 @@ const AddProduct = ({ title }: Props) => {
     id,
   } = useProductAdmin();
   const [imageFile, setImageFile] = useState<File | undefined>();
+  const additionalImageFields = [
+    { fileKey: "rearViewFile", previewKey: "rearView", label: "Select Rear View Image" },
+    { fileKey: "topViewFile", previewKey: "topView", label: "Select Top View Image" },
+    { fileKey: "sideView1File", previewKey: "sideView1", label: "Select Side View 1 Image" },
+    { fileKey: "sideView2File", previewKey: "sideView2", label: "Select Side View 2 Image" },
+  ] as const;
 
   return (
     <>
@@ -147,6 +153,57 @@ const AddProduct = ({ title }: Props) => {
                   }}
                 />
               </Field.Root>
+            </Box>
+
+            <Box gridColumn={{ base: "auto", md: "1 / -1" }}>
+              <Text fontWeight="bold" marginBottom={3}>
+                360° View Images
+              </Text>
+              <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} gap={4}>
+                {additionalImageFields.map(({ fileKey, previewKey, label }) => (
+                  <Field.Root key={fileKey}>
+                    <label
+                      htmlFor={fileKey}
+                      style={{
+                        display: "block",
+                        padding: "10px",
+                        backgroundColor: "#facfeb",
+                        color: "black",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {label}
+                    </label>
+                    {newProduct[previewKey] && (
+                      <Image
+                        marginTop={2}
+                        width="100%"
+                        height="140px"
+                        objectFit="contain"
+                        src={newProduct[previewKey]}
+                        alt={label}
+                      />
+                    )}
+                    <Input
+                      id={fileKey}
+                      type="file"
+                      accept="image/*"
+                      display="none"
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const imageURL = URL.createObjectURL(file);
+                        setNewProduct({
+                          ...newProduct,
+                          [fileKey]: file,
+                          [previewKey]: imageURL,
+                        });
+                      }}
+                    />
+                  </Field.Root>
+                ))}
+              </SimpleGrid>
             </Box>
 
             {/* RIGHT SIDE */}
@@ -395,6 +452,8 @@ const AddProduct = ({ title }: Props) => {
                   id: uuidv4(), category: "Category", gender: "Gender", productDescription: "", productPrice: "",
                   productName: "", isDiscounted: false, isArchived: false, oldProductPrice: "", sizesAndQuantities: [],
                   href: "product/", productImg: undefined,
+                  rearView: undefined, topView: undefined, sideView1: undefined, sideView2: undefined,
+                  imageFile: undefined, rearViewFile: undefined, topViewFile: undefined, sideView1File: undefined, sideView2File: undefined,
                 });
                 setImageFile(undefined);
               } catch (error) {

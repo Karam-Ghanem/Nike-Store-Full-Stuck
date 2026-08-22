@@ -24,6 +24,10 @@ export interface ApiProduct {
   isDiscounted: boolean;
   gender: string;
   image: string | null;
+  rear_view: string | null;
+  top_view: string | null;
+  side_view1: string | null;
+  sideView2: string | null;
   is_active: boolean;
   isArchived: boolean;
   category: ApiCategory;
@@ -185,6 +189,10 @@ export interface ProductWritePayload {
   categoryName: string;
   sizes: Array<{ size: string; stock: number }>;
   imageFile?: File;
+  rearViewFile?: File;
+  topViewFile?: File;
+  sideView1File?: File;
+  sideView2File?: File;
 }
 
 function productFormData(payload: ProductWritePayload) {
@@ -197,6 +205,10 @@ function productFormData(payload: ProductWritePayload) {
   form.append('is_active', 'true');
   form.append('sizes_data', JSON.stringify(payload.sizes));
   if (payload.imageFile) form.append('image', payload.imageFile);
+  if (payload.rearViewFile) form.append('rear_view', payload.rearViewFile);
+  if (payload.topViewFile) form.append('top_view', payload.topViewFile);
+  if (payload.sideView1File) form.append('side_view1', payload.sideView1File);
+  if (payload.sideView2File) form.append('sideView2', payload.sideView2File);
   return form;
 }
 
@@ -222,6 +234,10 @@ export function mapApiProduct(product: ApiProduct): Product {
   return {
     id: String(product.id),
     productImg: productImageUrl(product.image),
+    rearView: productImageUrl(product.rear_view),
+    topView: productImageUrl(product.top_view),
+    sideView1: productImageUrl(product.side_view1),
+    sideView2: productImageUrl(product.sideView2),
     productName: product.name,
     productDescription: product.description,
     productPrice: `${product.price}$`,

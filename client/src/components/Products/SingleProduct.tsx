@@ -180,7 +180,15 @@ const SingleProduct = ({isAdmin}:Props) => {
 
       {/* 360° View */}
       <MainTitle title=" 360° View" />
-      <View360 />
+      <View360
+        images={[
+          currentProduct?.productImg,
+          currentProduct?.rearView,
+          currentProduct?.topView,
+          currentProduct?.sideView1,
+          currentProduct?.sideView2,
+        ]}
+      />
 
       {/* Related Products */}
       <Box display={isAdmin ? "none" : "block"}>

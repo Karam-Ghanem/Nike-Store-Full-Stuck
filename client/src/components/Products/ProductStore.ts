@@ -35,6 +35,10 @@ const toProductPayload = (product: Product): ProductWritePayload => ({
   categoryName: product.category,
   sizes: product.sizesAndQuantities.map((size) => ({ size: size.Size, stock: size.quantity })),
   imageFile: product.imageFile,
+  rearViewFile: product.rearViewFile,
+  topViewFile: product.topViewFile,
+  sideView1File: product.sideView1File,
+  sideView2File: product.sideView2File,
 });
 
 const filterProducts = (products: Product[], query: Query) => {
