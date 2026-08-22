@@ -1005,3 +1005,59 @@ http://localhost:8000/admin/
 - ✅ معالجة الأخطاء الشاملة
 
 **جاهز للاستخدام والتطوير!**
+
+
+---
+
+## تنبيه انخفاض المخزون عبر n8n
+
+تمت إضافة خدمة `store/low_stock.py` لإرسال طلب `POST` إلى Webhook الخاص بـ n8n عندما تنخفض كمية مقاس المنتج من قيمة أعلى من العتبة إلى العتبة أو أقل. العتبة الافتراضية هي 5، ويمكن تغييرها من خلال متغير البيئة `LOW_STOCK_THRESHOLD`.
+
+يُحفظ رابط Webhook في ملف البيئة المحلي ولا يوضع في الكود مباشرة. انسخ الملف النموذجي:
+
+```bash
+cd server
+cp .env.example .env
+```
+
+يجب أن يحتوي `server/.env` على الرابط الحقيقي الذي زوّدتني به، ولا ترفع هذا الملف إلى GitHub لأن رابط Webhook قد يسمح بتشغيل Workflow مباشرة:
+
+```env
+LOW_STOCK_WEBHOOK_URL=https://your-n8n-host/webhook/your-low-stock-workflow
+LOW_STOCK_THRESHOLD=5
+```
+
+يتم استدعاء الخدمة بعد خصم المخزون في `OrderCreateSerializer.create()` داخل `store/serializers.py`. أُخّر الاستدعاء إلى ما بعد نجاح المعاملة باستخدام `transaction.on_commit`، حتى لا يصل إشعار إلى n8n إذا فشل إنشاء الطلب أو تراجعت المعاملة. كما يُرسل الطلب في Thread منفصل حتى لا ينتظر العميل تنفيذ Workflow n8n أثناء Checkout.
+
+مثال على JSON المرسل إلى n8n:
+
+```json
+{
+  "event": "low_stock",
+  "threshold": 5,
+  "stock": 5,
+  "previous_stock": 6,
+  "product": {
+    "id": 12,
+    "name": "Nike Air Max",
+    "slug": "nike-air-max-a1b2c3d4"
+  },
+  "size": {
+    "id": 31,
+    "name": "42"
+  },
+  "sent_at": "2026-08-22T12:00:00+00:00"
+}
+```
+
+يتم إرسال تنبيه عند العبور إلى 5 أو أقل، وليس مع كل طلب لاحق تكون فيه الكمية أصلاً أقل أو مساوية لـ5. فإذا انتقلت الكمية من 6 إلى 5 يصل إشعار، أما الانتقال من 5 إلى 4 فلا يعاد إرسال إشعار لنفس حالة الانخفاض. ويمكن تعديل هذه السياسة لاحقاً إذا كان Workflow يحتاج تنبيهاً عند كل انخفاض.
+
+الملفات المتعلقة بهذه الإضافة هي:
+
+```text
+server/store/low_stock.py       # خدمة بناء وإرسال الإشعار
+server/store/serializers.py     # نقطة استدعاء الخدمة بعد خصم المخزون
+server/NikeStore/settings.py    # قراءة متغيرات البيئة
+server/.env.example             # نموذج الإعداد المحلي
+server/requirements.txt         # إضافة python-dotenv
+```

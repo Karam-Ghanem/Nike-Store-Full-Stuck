@@ -7,6 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
+from .low_stock import notify_low_stock
 from .models import (
     CartItem,
     Category,
@@ -103,11 +104,27 @@ class ProductSerializer(serializers.ModelSerializer):
             validated_data['category'] = self._resolve_category(validated_data, category_name)
         product = super().update(instance, validated_data)
         if sizes_data is not None:
+            previous_stocks = {
+                size_obj.size: size_obj.stock
+                for size_obj in product.sizes.all()
+            }
             resolved = self._resolve_sizes(sizes_data)
             names = {size for size, _ in resolved}
             product.sizes.exclude(size__in=names).delete()
             for size, stock in resolved:
-                ProductSize.objects.update_or_create(product=product, size=size, defaults={'stock': stock})
+                product_size, _ = ProductSize.objects.update_or_create(
+                    product=product,
+                    size=size,
+                    defaults={'stock': stock},
+                )
+                previous_stock = previous_stocks.get(size)
+                if previous_stock is not None:
+                    transaction.on_commit(
+                        lambda product_size=product_size, previous_stock=previous_stock: notify_low_stock(
+                            product_size,
+                            previous_stock,
+                        )
+                    )
         return product
 
 
@@ -282,8 +299,15 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 quantity=quantity,
                 price=line_price,
             )
+            previous_stock = product_size.stock
             product_size.stock -= quantity
             product_size.save(update_fields=['stock'])
+            transaction.on_commit(
+                lambda product_size=product_size, previous_stock=previous_stock: notify_low_stock(
+                    product_size,
+                    previous_stock,
+                )
+            )
         return order
 
 
