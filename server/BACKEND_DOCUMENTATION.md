@@ -1020,10 +1020,10 @@ cd server
 cp .env.example .env
 ```
 
-يجب أن يحتوي `server/.env` على الرابط الحقيقي الذي زوّدتني به، ولا ترفع هذا الملف إلى GitHub لأن رابط Webhook قد يسمح بتشغيل Workflow مباشرة:
+الرابط الذي زوّدني به المستخدم مهيأ افتراضياً داخل `settings.py` حتى يعمل التكامل مباشرة بعد Pull. ومع ذلك، يمكن تجاوزه من خلال `server/.env`، ولا ترفع هذا الملف إلى GitHub لأن رابط Webhook قد يسمح بتشغيل Workflow مباشرة:
 
 ```env
-LOW_STOCK_WEBHOOK_URL=https://your-n8n-host/webhook/your-low-stock-workflow
+LOW_STOCK_WEBHOOK_URL=https://syruanaaiteam09.app.n8n.cloud/webhook/nike-low-stock-alert
 LOW_STOCK_THRESHOLD=5
 ```
 

@@ -159,5 +159,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # n8n low-stock notification settings.
-LOW_STOCK_WEBHOOK_URL = os.getenv('LOW_STOCK_WEBHOOK_URL', '')
+LOW_STOCK_WEBHOOK_URL = os.getenv(
+    'LOW_STOCK_WEBHOOK_URL',
+    'https://syruanaaiteam09.app.n8n.cloud/webhook/nike-low-stock-alert',
+)
 LOW_STOCK_THRESHOLD = int(os.getenv('LOW_STOCK_THRESHOLD', '5'))
