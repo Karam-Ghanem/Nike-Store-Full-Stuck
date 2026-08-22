@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@chakra-ui/react";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import useTextReview from "@/Pages/Review/Hook/useTextReview";
+import useAuthStore from "@/auth/authStore";
 
 
 const TextReviewForm = () => {
@@ -30,8 +31,7 @@ const TextReviewForm = () => {
     singleReview,
     setSingleReview
   } = useTextReview();
-
-
+  const user = useAuthStore((state) => state.user);
 
   return (
     <Box>
@@ -171,6 +171,7 @@ const TextReviewForm = () => {
                 </Field.Root>
               </Stack>
               <Button
+                type="button"
                 disabled={
                   singleReview.description &&
                   singleReview.name &&
@@ -181,6 +182,14 @@ const TextReviewForm = () => {
                 marginTop={4}
                 bg="#a353e9"
                 onClick={async () => {
+                  if (!user) {
+                    toaster.create({
+                      title: "Please log in before submitting a review.",
+                      type: "info",
+                      duration: 4000,
+                    });
+                    return;
+                  }
                   try {
                     await AddReview(singleReview);
                     setSingleReview({ name: "", img: undefined, description: "" });

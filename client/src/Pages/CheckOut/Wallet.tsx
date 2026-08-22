@@ -75,7 +75,7 @@ const Wallet = () => {
         items,
       });
       setTransactionData({ ...transactionData, transactionID: '' });
-      clearCartAfterOrder();
+      await clearCartAfterOrder();
       resetCheckout();
       await loadPurchases();
       toaster.create({ title: 'Your order has been created successfully.', type: 'success', duration: 4000 });

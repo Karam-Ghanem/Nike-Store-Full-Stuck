@@ -35,7 +35,7 @@ interface CartStore {
   getTotalPrice: (cartItems: CatrtItem[]) => number;
   getFinalPrice: () => number;
   addProductsToMyPurchases: (myPurchases: CatrtItem[], purchaseDate: Date) => void;
-  clearCartAfterOrder: () => void;
+  clearCartAfterOrder: () => Promise<void>;
   returnProduct: (productID: string | Product, reason?: string) => Promise<void>;
   editProductPriceAfterUseCoupon: () => void;
 }
@@ -159,12 +159,22 @@ const useCartStore = create<CartStore>((set, get) => ({
     isDiscounted: false,
   }),
 
-  clearCartAfterOrder: () => set({
-    cartItems: [],
-    couponCode: null,
-    couponDiscountAmount: 0,
-    isDiscounted: false,
-  }),
+  clearCartAfterOrder: async () => {
+    const items = get().cartItems;
+    if (getAccessToken()) {
+      await Promise.allSettled(
+        items
+          .filter((item) => item.cartItemId)
+          .map((item) => commerceApi.removeCartItem(item.cartItemId as number)),
+      );
+    }
+    set({
+      cartItems: [],
+      couponCode: null,
+      couponDiscountAmount: 0,
+      isDiscounted: false,
+    });
+  },
 
   returnProduct: async (productID, reason = '') => {
     const key = typeof productID === 'string' ? productID : productID.id;
