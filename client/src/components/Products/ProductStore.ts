@@ -6,7 +6,7 @@ import type { CatrtItem } from "@/Pages/Cart/cartStore";
 import type { Archive } from "@/Admin/page/archive/archiveList";
 
 import type { Product } from "./Products Data/productsList";
-import ProductsList from "./Products Data/productsList";
+import ProductsList from "./Products Data/RealProductsData";
 import type { Query } from "./ProductControls";
 
 interface ProductStore {
