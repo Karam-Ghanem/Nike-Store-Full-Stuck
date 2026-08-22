@@ -155,57 +155,6 @@ const AddProduct = ({ title }: Props) => {
               </Field.Root>
             </Box>
 
-            <Box gridColumn={{ base: "auto", md: "1 / -1" }}>
-              <Text fontWeight="bold" marginBottom={3}>
-                360° View Images
-              </Text>
-              <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} gap={4}>
-                {additionalImageFields.map(({ fileKey, previewKey, label }) => (
-                  <Field.Root key={fileKey}>
-                    <label
-                      htmlFor={fileKey}
-                      style={{
-                        display: "block",
-                        padding: "10px",
-                        backgroundColor: "#facfeb",
-                        color: "black",
-                        cursor: "pointer",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {label}
-                    </label>
-                    {newProduct[previewKey] && (
-                      <Image
-                        marginTop={2}
-                        width="100%"
-                        height="140px"
-                        objectFit="contain"
-                        src={newProduct[previewKey]}
-                        alt={label}
-                      />
-                    )}
-                    <Input
-                      id={fileKey}
-                      type="file"
-                      accept="image/*"
-                      display="none"
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const imageURL = URL.createObjectURL(file);
-                        setNewProduct({
-                          ...newProduct,
-                          [fileKey]: file,
-                          [previewKey]: imageURL,
-                        });
-                      }}
-                    />
-                  </Field.Root>
-                ))}
-              </SimpleGrid>
-            </Box>
-
             {/* RIGHT SIDE */}
             <Box marginTop={{md:-10}}>
               <Text
@@ -435,6 +384,57 @@ const AddProduct = ({ title }: Props) => {
               </Menu.Root>
             </Box>
           </SimpleGrid>
+
+          <Box marginTop={8} padding={4} border="1px solid #a800b7" borderRadius="md">
+            <Text fontWeight="bold" marginBottom={3}>
+              360° View Images (4 additional images)
+            </Text>
+            <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} gap={4}>
+              {additionalImageFields.map(({ fileKey, previewKey, label }) => (
+                <Field.Root key={fileKey}>
+                  <label
+                    htmlFor={fileKey}
+                    style={{
+                      display: "block",
+                      padding: "10px",
+                      backgroundColor: "#facfeb",
+                      color: "black",
+                      cursor: "pointer",
+                      fontSize: "13px",
+                    }}
+                  >
+                    {label}
+                  </label>
+                  {newProduct[previewKey] && (
+                    <Image
+                      marginTop={2}
+                      width="100%"
+                      height="140px"
+                      objectFit="contain"
+                      src={newProduct[previewKey]}
+                      alt={label}
+                    />
+                  )}
+                  <Input
+                    id={fileKey}
+                    type="file"
+                    accept="image/*"
+                    display="none"
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const imageURL = URL.createObjectURL(file);
+                      setNewProduct({
+                        ...newProduct,
+                        [fileKey]: file,
+                        [previewKey]: imageURL,
+                      });
+                    }}
+                  />
+                </Field.Root>
+              ))}
+            </SimpleGrid>
+          </Box>
 
           {/* SUBMIT BUTTON ALWAYS LAST */}
           <Button
